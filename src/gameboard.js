@@ -1,38 +1,59 @@
+import { Ship } from "./ship.js";
+
 export class Gameboard {
   constructor() {
     this.length = 10;
     this.height = 10;
-    this.shipOnePlaced = false;
-    this.shipTwoPlaced = false;
-    this.shipThreePlaced = false;
-    this.shipFourPlaced = false;
-    this.shipFivePlaced = false;
+    this.shipOne = [0, 0, ""];
+    this.shipTwo = [0, 0, ""];
+    this.shipThree = [0, 0, ""];
+    this.shipFour = [0, 0, ""];
+    this.shipFive = [0, 0, ""];
   }
 
-  placeShips(ship) {
-    let shipType;
+  placeShips(ship, xCoord, yCoord, orientation) {
+    let newShip;
+    let shipProperty;
+    const formatShip = ship.toLowerCase();
+    const formatOrientation = orientation.toLowerCase();
 
-    let formatShip = ship.toLowerCase();
+    if (formatOrientation !== "h" && formatOrientation !== "v")
+      throw new Error("Invalid orientation entry.");
+
     switch (formatShip) {
       case "carrier":
-        shipType = 1;
+        newShip = new Ship(5);
+        shipProperty = "shipOne";
+        this.shipOne = [xCoord, yCoord, formatOrientation];
         break;
       case "battleship":
-        shipType = 2;
+        newShip = new Ship(4);
+        shipProperty = "shipTwo";
+        this.shipTwo = [xCoord, yCoord, formatOrientation];
         break;
       case "cruiser":
-        shipType = 3;
+        newShip = new Ship(3);
+        shipProperty = "shipThree";
+        this.shipThree = [xCoord, yCoord, formatOrientation];
         break;
       case "submarine":
-        shipType = 4;
+        newShip = new Ship(3);
+        shipProperty = "shipFour";
+        this.shipFour = [xCoord, yCoord, formatOrientation];
         break;
       case "destroyer":
-        shipType = 5;
+        newShip = new Ship(2);
+        shipProperty = "shipFive";
+        this.shipFive = [xCoord, yCoord, formatOrientation];
         break;
       default:
         throw new Error("Invalid ship entry.");
     }
 
-    return shipType;
+    return {
+      shipLength: newShip.length,
+      shipCoordinates: [this[shipProperty][0], this[shipProperty][1]],
+      shipOrientation: this[shipProperty][2],
+    };
   }
 }
