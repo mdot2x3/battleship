@@ -20,6 +20,15 @@ export class Gameboard {
     if (formatOrientation !== "h" && formatOrientation !== "v")
       throw new Error("Invalid orientation entry.");
 
+    if (xCoord < 0 || xCoord > 10)
+      throw new Error(
+        "X Coordinate must be no less than 0 and no greater than 10.",
+      );
+    if (yCoord < 0 || yCoord > 10)
+      throw new Error(
+        "Y Coordinate must be no less than 0 and no greater than 10.",
+      );
+
     switch (formatShip) {
       case "carrier":
         newShip = new Ship(5);

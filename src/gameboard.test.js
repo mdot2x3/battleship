@@ -60,6 +60,9 @@ describe("Gameboard", () => {
       shipCoordinates: [1, 2],
       shipOrientation: "h",
     });
+    expect(() => gameboard.placeShips("destroyer", -1, 2, "h")).toThrow();
+    expect(() => gameboard.placeShips("destroyer", 1, 16, "V")).toThrow();
+    expect(() => gameboard.placeShips("destroyer", 4, 5, "z")).toThrow();
   });
 
   //   receiveAttack;
