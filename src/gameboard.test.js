@@ -106,7 +106,45 @@ describe("Gameboard", () => {
   });
 
   test("Gameboard has a receiveAttack method", () => {
-    expect(gameboard.receiveAttack(1, 1)).toBe("hit");
+    gameboard.placeShips("Carrier", 2, 4, "h");
+    expect(gameboard.receiveAttack(3, 4)).toBe("hit");
+  });
+
+  test("receiveAttack method registers hits", () => {
+    gameboard.placeShips("Carrier", 2, 4, "h");
+    expect(gameboard.receiveAttack(3, 4)).toBe("hit");
+  });
+
+  test("receiveAttack method calls the targeted Ship's hit method", () => {
+    gameboard.placeShips("Carrier", 2, 4, "h");
+    // replace the ship object with a mock
+    gameboard.shipOneObject = { hit: jest.fn() };
+    // attack a coordinate that should hit the carrier
+    gameboard.receiveAttack(3, 4);
+    // assert that hit() was called
+    expect(gameboard.shipOneObject.hit).toHaveBeenCalled();
+  });
+
+  test("receiveAttack method registers missed shots", () => {
+    gameboard.placeShips("Carrier", 2, 4, "h");
+    expect(gameboard.receiveAttack(10, 10)).toBe("miss");
+    expect(gameboard.receiveAttack(1, 4)).toBe("miss");
+    expect(gameboard.receiveAttack(7, 4)).toBe("miss");
+    expect(gameboard.receiveAttack(0, 0)).toBe("miss");
+  });
+
+  test("receiveAttack method records all missed shots", () => {
+    gameboard.placeShips("Carrier", 2, 4, "h");
+    expect(gameboard.receiveAttack(10, 10)).toBe("miss");
+    expect(gameboard.receiveAttack(1, 4)).toBe("miss");
+    expect(gameboard.receiveAttack(7, 4)).toBe("miss");
+    expect(gameboard.receiveAttack(0, 0)).toBe("miss");
+    expect(gameboard.missCoordinates).toStrictEqual([
+      [10, 10],
+      [1, 4],
+      [7, 4],
+      [0, 0],
+    ]);
   });
 
   //   missedAttacks;
