@@ -20,6 +20,7 @@ export class Gameboard {
     this.shipFourObject = undefined;
     this.shipFiveObject = undefined;
     this.missCoordinates = [];
+    this.sunkShipCount = 0;
   }
 
   // helper function to ensure input coordinates are valid
@@ -119,7 +120,7 @@ export class Gameboard {
         newShip = new Ship(2);
         shipCoordinates = "shipFiveCoordinates";
         shipOrientation = "shipFiveOrientation";
-        this.shipFourObject = newShip;
+        this.shipFiveObject = newShip;
         this.shipFiveCoordinates = [[xCoord, yCoord]];
         this.shipFiveOrientation = formatOrientation;
         if (this.shipFiveOrientation === "h") {
@@ -159,10 +160,21 @@ export class Gameboard {
     for (let i = 0; i < shipCoordProps.length; i++) {
       if (shipCoordProps[i].some(([x, y]) => x === xCoord && y === yCoord)) {
         shipObjProps[i].hit();
+        if (shipObjProps[i].isSunk()) {
+          this.sunkShipCount += 1;
+          return "sunk";
+        }
         return "hit";
       }
     }
     this.missCoordinates.push([xCoord, yCoord]);
     return "miss";
+  }
+
+  reportAllSunk() {
+    if (this.sunkShipCount >= 5) {
+      return true;
+    }
+    return false;
   }
 }

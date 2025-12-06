@@ -117,8 +117,8 @@ describe("Gameboard", () => {
 
   test("receiveAttack method calls the targeted Ship's hit method", () => {
     gameboard.placeShips("Carrier", 2, 4, "h");
-    // replace the ship object with a mock
-    gameboard.shipOneObject = { hit: jest.fn() };
+    // replace the ship object with a mock ship (isSunk added later to avoid test TypeError)
+    gameboard.shipOneObject = { hit: jest.fn(), isSunk: jest.fn(() => false) };
     // attack a coordinate that should hit the carrier
     gameboard.receiveAttack(3, 4);
     // assert that hit() was called
@@ -147,7 +147,59 @@ describe("Gameboard", () => {
     ]);
   });
 
-  //   missedAttacks;
+  test("receiveAttack method reports a sunk ship", () => {
+    gameboard.placeShips("Carrier", 2, 4, "h");
+    expect(gameboard.receiveAttack(2, 4)).toBe("hit");
+    expect(gameboard.receiveAttack(3, 4)).toBe("hit");
+    expect(gameboard.receiveAttack(4, 4)).toBe("hit");
+    expect(gameboard.receiveAttack(5, 4)).toBe("hit");
+    expect(gameboard.receiveAttack(6, 4)).toBe("sunk");
+    gameboard.placeShips("Destroyer", 5, 5, "v");
+    expect(gameboard.receiveAttack(5, 5)).toBe("hit");
+    expect(gameboard.receiveAttack(5, 6)).toBe("sunk");
+  });
 
-  //   reportAllSunk;
+  test("reportAllSunk method reports false if not all ships are sunk", () => {
+    expect(gameboard.reportAllSunk()).toBe(false);
+    gameboard.placeShips("Destroyer", 5, 5, "v");
+    gameboard.receiveAttack(5, 5);
+    gameboard.receiveAttack(5, 6);
+    expect(gameboard.reportAllSunk()).toBe(false);
+    expect(gameboard.sunkShipCount).toBe(1);
+    gameboard.placeShips("Destroyer", 7, 7, "v");
+    gameboard.receiveAttack(7, 7);
+    gameboard.receiveAttack(7, 8);
+    expect(gameboard.reportAllSunk()).toBe(false);
+    expect(gameboard.sunkShipCount).toBe(2);
+    gameboard.placeShips("Destroyer", 3, 3, "v");
+    gameboard.receiveAttack(3, 3);
+    gameboard.receiveAttack(3, 4);
+    expect(gameboard.reportAllSunk()).toBe(false);
+    expect(gameboard.sunkShipCount).toBe(3);
+    gameboard.placeShips("Destroyer", 9, 9, "v");
+    gameboard.receiveAttack(9, 9);
+    gameboard.receiveAttack(9, 10);
+    expect(gameboard.reportAllSunk()).toBe(false);
+    expect(gameboard.sunkShipCount).toBe(4);
+  });
+
+  test("reportAllSunk method reports true if all ships are sunk", () => {
+    gameboard.placeShips("Destroyer", 5, 5, "v");
+    gameboard.receiveAttack(5, 5);
+    gameboard.receiveAttack(5, 6);
+    gameboard.placeShips("Destroyer", 7, 7, "v");
+    gameboard.receiveAttack(7, 7);
+    gameboard.receiveAttack(7, 8);
+    gameboard.placeShips("Destroyer", 3, 3, "v");
+    gameboard.receiveAttack(3, 3);
+    gameboard.receiveAttack(3, 4);
+    gameboard.placeShips("Destroyer", 9, 9, "v");
+    gameboard.receiveAttack(9, 9);
+    gameboard.receiveAttack(9, 10);
+    gameboard.placeShips("Destroyer", 1, 1, "v");
+    gameboard.receiveAttack(1, 1);
+    gameboard.receiveAttack(1, 2);
+    expect(gameboard.reportAllSunk()).toBe(true);
+    expect(gameboard.sunkShipCount).toBe(5);
+  });
 });
