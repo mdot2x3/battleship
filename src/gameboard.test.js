@@ -52,12 +52,12 @@ describe("Gameboard", () => {
       ],
       shipOrientation: "v",
     });
-    expect(gameboard.placeShips("Submarine", 0, 1, "H")).toStrictEqual({
+    expect(gameboard.placeShips("Submarine", 1, 1, "H")).toStrictEqual({
       shipLength: 3,
       shipCoordinates: [
-        [0, 1],
         [1, 1],
         [2, 1],
+        [3, 1],
       ],
       shipOrientation: "h",
     });
@@ -130,7 +130,7 @@ describe("Gameboard", () => {
     expect(gameboard.receiveAttack(10, 10)).toBe("miss");
     expect(gameboard.receiveAttack(1, 4)).toBe("miss");
     expect(gameboard.receiveAttack(7, 4)).toBe("miss");
-    expect(gameboard.receiveAttack(0, 0)).toBe("miss");
+    expect(gameboard.receiveAttack(1, 1)).toBe("miss");
   });
 
   test("receiveAttack method records all missed shots", () => {
@@ -138,12 +138,12 @@ describe("Gameboard", () => {
     expect(gameboard.receiveAttack(10, 10)).toBe("miss");
     expect(gameboard.receiveAttack(1, 4)).toBe("miss");
     expect(gameboard.receiveAttack(7, 4)).toBe("miss");
-    expect(gameboard.receiveAttack(0, 0)).toBe("miss");
+    expect(gameboard.receiveAttack(1, 1)).toBe("miss");
     expect(gameboard.missCoordinates).toStrictEqual([
       [10, 10],
       [1, 4],
       [7, 4],
-      [0, 0],
+      [1, 1],
     ]);
   });
 

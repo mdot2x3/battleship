@@ -25,13 +25,13 @@ export class Gameboard {
 
   // helper function to ensure input coordinates are valid
   inBounds(xCoord, yCoord) {
-    if (xCoord < 0 || xCoord > 10)
+    if (xCoord < 1 || xCoord > 10)
       throw new Error(
-        "X Coordinate must be no less than 0 and no greater than 10.",
+        "X Coordinate must be no less than 1 and no greater than 10.",
       );
-    if (yCoord < 0 || yCoord > 10)
+    if (yCoord < 1 || yCoord > 10)
       throw new Error(
-        "Y Coordinate must be no less than 0 and no greater than 10.",
+        "Y Coordinate must be no less than 1 and no greater than 10.",
       );
   }
 
