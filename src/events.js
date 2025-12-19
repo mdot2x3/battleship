@@ -1,128 +1,116 @@
-export function setupEvents(player1, player2) {
-  document.addEventListener("DOMContentLoaded", () => {
-    newGame();
-  });
+import {
+  drawShipPreview,
+  clearShipVisuals,
+  drawShips,
+  updateGameText,
+  showError,
+} from "./render.js";
 
-  const domContent = document.querySelector(".dom-content");
-  const gameText = document.querySelector(".game-text");
+const domContent = document.querySelector(".dom-content");
+const player1Div = document.querySelector(".gameboard-left");
+const player2Div = document.querySelector(".gameboard-right");
 
-  function newGame() {
-    gameText.innerHTML = `
+export function newGame(player1, player2) {
+  updateGameText(`
     <p>Click to Start: </p>
     <button class="new-button">New Game</button>
-    `;
-    const newButton = gameText.querySelector(".new-button");
-    newButton.addEventListener("click", setupGame);
+  `);
+  const newButton = document.querySelector(".new-button");
+  newButton.addEventListener("click", () => setupGame(player1, player2));
+}
+
+export function setupGame(player1, player2) {
+  const shipList = [
+    "Carrier",
+    "Battleship",
+    "Cruiser",
+    "Submarine",
+    "Destroyer",
+  ];
+  let currentShipIndex = 0;
+  let currentOrientation = "h";
+  let currentHeadCell = null;
+
+  let currentPlayer = player1;
+  let currentPlayerString = "Player 1";
+  let boardSelector = ".gameboard-left";
+  let boardDiv = player1Div;
+
+  function updatePlacementText() {
+    updateGameText(`
+      <p>${currentPlayerString}, place your ${shipList[currentShipIndex]} on the board.</p>
+      <p>Click again to rotate. Click elsewhere to move. Confirm placement when ready.</p>
+      <button class="confirm-button">Confirm</button>
+    `);
+    document.querySelector(".confirm-button").onclick = confirmPlacement;
   }
 
-  function setupGame() {
-    const shipList = [
-      "Carrier",
-      "Battleship",
-      "Cruiser",
-      "Submarine",
-      "Destroyer",
-    ];
-    let currentShipIndex = 0;
-    let currentOrientation = "h";
-    let currentHeadCell = null;
-
-    let currentPlayer = player1;
-    let currentPlayerString = "Player 1";
-    let boardSelector = ".gameboard-left";
-
-    function updateGameText() {
-      gameText.innerHTML = `
-            <p>${currentPlayerString}, place your ${shipList[currentShipIndex]} on the board.</p>
-            <p>Click again to rotate. Click elsewhere to move. Confirm placement when ready.</p>
-            <button class="confirm-button">Confirm</button>
-            `;
-      gameText.querySelector(".confirm-button").onclick = confirmPlacement;
-    }
-
-    function clearShipVisuals() {
-      const cells = domContent.querySelectorAll(`${boardSelector} .grid-cell`);
-      cells.forEach((cell) => cell.classList.remove("ship-preview"));
-    }
-
-    function drawShipPreview(x, y, orientation) {
-      clearShipVisuals();
-      // compacted way to setup an array and immediately access an index
-      const shipLen = [5, 4, 3, 3, 2][currentShipIndex];
-      for (let i = 0; i < shipLen; i++) {
-        let cell;
-        if (orientation === "h") {
-          cell = domContent.querySelector(
-            `${boardSelector} .grid-cell[data-x="${x + i}"][data-y="${y}"]`,
-          );
-        } else {
-          cell = domContent.querySelector(
-            `${boardSelector} .grid-cell[data-x="${x}"][data-y="${y + i}"]`,
-          );
-        }
-        if (cell) cell.classList.add("ship-preview");
-      }
-    }
-
-    function handlePreviewClick(event) {
-      if (!event.target.classList.contains("grid-cell")) return;
-      const x = Number(event.target.dataset.x);
-      const y = Number(event.target.dataset.y);
-
-      if (
-        currentHeadCell &&
-        currentHeadCell.x === x &&
-        currentHeadCell.y === y
-      ) {
-        currentOrientation = currentOrientation === "h" ? "v" : "h";
-      } else {
-        currentHeadCell = { x, y };
-        currentOrientation = "h";
-      }
-      drawShipPreview(x, y, currentOrientation);
-    }
-
-    function confirmPlacement() {
-      try {
-        currentPlayer.gameboard.placeShips(
-          shipList[currentShipIndex],
-          currentHeadCell.x,
-          currentHeadCell.y,
-          currentOrientation,
-        );
-        currentShipIndex++;
-
-        if (currentShipIndex < shipList.length) {
-          currentHeadCell = null;
-          updateGameText();
-          clearShipVisuals();
-        } else if (currentPlayerString === "Player1") {
-          currentPlayerString = "Player 2";
-          currentPlayer = player2;
-          boardSelector = ".gameboard-right";
-          currentShipIndex = 0;
-          currentHeadCell = null;
-          updateGameText();
-          clearShipVisuals();
-        } else {
-          startGame();
-        }
-      } catch (err) {
-        gameText.innerHTML = `<p style="color:red;">${err.message}</p>`;
-      }
-    }
-
-    domContent.addEventListener("click", handlePreviewClick);
-    updateGameText();
-  }
-
-  function startGame() {
-    domContent.addEventListener("click", handleAttackClick);
-  }
-
-  function handleAttackClick(event) {
+  function handlePreviewClick(event) {
     if (!event.target.classList.contains("grid-cell")) return;
+    const x = Number(event.target.dataset.x);
+    const y = Number(event.target.dataset.y);
 
+    if (currentHeadCell && currentHeadCell.x === x && currentHeadCell.y === y) {
+      currentOrientation = currentOrientation === "h" ? "v" : "h";
+    } else {
+      currentHeadCell = { x, y };
+      currentOrientation = "h";
+    }
+    drawShipPreview(
+      x,
+      y,
+      currentOrientation,
+      [5, 4, 3, 3, 2][currentShipIndex],
+      boardSelector,
+    );
+  }
+
+  function confirmPlacement() {
+    try {
+      currentPlayer.gameboard.placeShips(
+        shipList[currentShipIndex],
+        currentHeadCell.x,
+        currentHeadCell.y,
+        currentOrientation,
+      );
+      // draw the placed ship
+      const coords =
+        currentPlayer.gameboard[
+          `ship${["One", "Two", "Three", "Four", "Five"][currentShipIndex]}Coordinates`
+        ];
+      drawShips(coords, boardDiv);
+
+      currentShipIndex++;
+      if (currentShipIndex < shipList.length) {
+        currentHeadCell = null;
+        updatePlacementText();
+        clearShipVisuals(boardSelector);
+      } else if (currentPlayerString === "Player 1") {
+        // switch to Player 2
+        currentPlayerString = "Player 2";
+        currentPlayer = player2;
+        boardSelector = ".gameboard-right";
+        boardDiv = player2Div;
+        currentShipIndex = 0;
+        currentHeadCell = null;
+        updatePlacementText();
+        clearShipVisuals(boardSelector);
+      } else {
+        // all ships placed, start game
+        startGame(player1, player2);
+      }
+    } catch (err) {
+      showError(err.message);
+    }
+  }
+
+  domContent.addEventListener("click", handlePreviewClick);
+  updatePlacementText();
+}
+
+function handleAttackClick(player1, player2) {
+  return function (event) {
+    if (!event.target.classList.contains("grid-cell")) return;
     if (event.target.classList.contains("attacked")) return;
     event.target.classList.add("attacked");
 
@@ -148,7 +136,14 @@ export function setupEvents(player1, player2) {
 
     if (gameOver) {
       console.log("Game Over");
-      domContent.removeEventListener("click", handleAttackClick);
+      domContent.removeEventListener(
+        "click",
+        handleAttackClick(player1, player2),
+      );
     }
-  }
+  };
+}
+
+export function startGame(player1, player2) {
+  domContent.addEventListener("click", handleAttackClick(player1, player2));
 }
