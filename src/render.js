@@ -1,16 +1,4 @@
 export function setupRender(player1, player2) {
-  player1.gameboard.placeShips("Carrier", 1, 1, "h");
-  player1.gameboard.placeShips("Battleship", 1, 3, "h");
-  player1.gameboard.placeShips("Cruiser", 1, 5, "h");
-  player1.gameboard.placeShips("Submarine", 1, 7, "h");
-  player1.gameboard.placeShips("Destroyer", 1, 9, "h");
-
-  player2.gameboard.placeShips("Carrier", 6, 1, "h");
-  player2.gameboard.placeShips("Battleship", 7, 3, "h");
-  player2.gameboard.placeShips("Cruiser", 8, 5, "h");
-  player2.gameboard.placeShips("Submarine", 8, 7, "h");
-  player2.gameboard.placeShips("Destroyer", 9, 9, "h");
-
   function createGrid(rows, columns, container) {
     //clear previous grid, if exists
     container.innerHTML = "";

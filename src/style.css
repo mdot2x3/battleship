@@ -22,6 +22,18 @@ header {
   font-size: 4rem;
 }
 
+.game-text {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-family: "Bitcount Prop Single", sans-serif;
+  font-size: 1.5rem;
+  color: white;
+}
+
 .dom-content {
   display: flex;
   justify-content: center;
@@ -33,7 +45,6 @@ header {
   max-height: 900px;
   min-width: 500px;
   max-width: 1200px;
-  margin-top: 30px;
   margin-left: auto;
   margin-right: auto;
   padding: 20px;
@@ -61,4 +72,9 @@ header {
   border: 1px solid #ccc;
   width: 100%;
   aspect-ratio: 1 / 1;
+}
+
+.ship-preview {
+  border: 2px solid black;
+  background-color: lightgrey;
 }
