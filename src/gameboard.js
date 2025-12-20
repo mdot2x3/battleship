@@ -39,6 +39,7 @@ export class Gameboard {
     let newShip;
     let shipCoordinates;
     let shipOrientation;
+    let shipLength;
     const formatShip = ship.toLowerCase();
     const formatOrientation = orientation.toLowerCase();
 
@@ -52,6 +53,7 @@ export class Gameboard {
         newShip = new Ship(5);
         shipCoordinates = "shipOneCoordinates";
         shipOrientation = "shipOneOrientation";
+        shipLength = 5;
         this.shipOneObject = newShip;
         this.shipOneCoordinates = [[xCoord, yCoord]];
         this.shipOneOrientation = formatOrientation;
@@ -69,6 +71,7 @@ export class Gameboard {
         newShip = new Ship(4);
         shipCoordinates = "shipTwoCoordinates";
         shipOrientation = "shipTwoOrientation";
+        shipLength = 4;
         this.shipTwoObject = newShip;
         this.shipTwoCoordinates = [[xCoord, yCoord]];
         this.shipTwoOrientation = formatOrientation;
@@ -86,6 +89,7 @@ export class Gameboard {
         newShip = new Ship(3);
         shipCoordinates = "shipThreeCoordinates";
         shipOrientation = "shipThreeOrientation";
+        shipLength = 3;
         this.shipThreeObject = newShip;
         this.shipThreeCoordinates = [[xCoord, yCoord]];
         this.shipThreeOrientation = formatOrientation;
@@ -103,6 +107,7 @@ export class Gameboard {
         newShip = new Ship(3);
         shipCoordinates = "shipFourCoordinates";
         shipOrientation = "shipFourOrientation";
+        shipLength = 3;
         this.shipFourObject = newShip;
         this.shipFourCoordinates = [[xCoord, yCoord]];
         this.shipFourOrientation = formatOrientation;
@@ -120,6 +125,7 @@ export class Gameboard {
         newShip = new Ship(2);
         shipCoordinates = "shipFiveCoordinates";
         shipOrientation = "shipFiveOrientation";
+        shipLength = 2;
         this.shipFiveObject = newShip;
         this.shipFiveCoordinates = [[xCoord, yCoord]];
         this.shipFiveOrientation = formatOrientation;
@@ -131,6 +137,13 @@ export class Gameboard {
         break;
       default:
         throw new Error("Invalid ship entry.");
+    }
+
+    // check all segments are in-bounds
+    for (let i = 0; i < shipLength; i++) {
+      const x = formatOrientation === "h" ? xCoord + i : xCoord;
+      const y = formatOrientation === "v" ? yCoord + i : yCoord;
+      this.inBounds(x, y);
     }
 
     return {

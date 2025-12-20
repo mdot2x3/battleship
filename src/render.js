@@ -1,4 +1,3 @@
-// DOM references
 const domContent = document.querySelector(".dom-content");
 const gameText = document.querySelector(".game-text");
 
@@ -60,6 +59,14 @@ export function updateGameText(html) {
 }
 
 // show an error message in the game text area
-export function showError(message) {
-  gameText.innerHTML += `<p style="color:red;">${message}</p>`;
+// confirmPlacement function is passed to showError via the onConfirm parameter
+export function showError(message, onConfirm = null) {
+  gameText.innerHTML += `<p class="error-message" style="color:red;">${message}</p>`;
+  // re-attach confirm button handler if needed
+  const confirmBtn = gameText.querySelector(".confirm-button");
+  // if the button and the confirmPlacement function exist
+  if (confirmBtn && onConfirm) {
+    // reassign confirmPlacement to the button's click event
+    confirmBtn.onclick = onConfirm;
+  }
 }

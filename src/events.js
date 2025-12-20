@@ -46,10 +46,12 @@ export function setupGame(player1, player2) {
   }
 
   function handlePreviewClick(event) {
+    clearError();
     if (!event.target.classList.contains("grid-cell")) return;
     const x = Number(event.target.dataset.x);
     const y = Number(event.target.dataset.y);
 
+    // toggle orientation if clicking the same cell, otherwise reset orientation
     if (currentHeadCell && currentHeadCell.x === x && currentHeadCell.y === y) {
       currentOrientation = currentOrientation === "h" ? "v" : "h";
     } else {
@@ -65,8 +67,23 @@ export function setupGame(player1, player2) {
     );
   }
 
+  // helper function to clear error messages
+  function clearError() {
+    const gameText = document.querySelector(".game-text");
+    // remove only error messages, not instructions/buttons
+    gameText.querySelectorAll(".error-message").forEach((p) => p.remove());
+  }
+
   function confirmPlacement() {
+    // clear previous error message, if exists
+    clearError();
+    // prevent user confirming without selecting a cell
+    if (!currentHeadCell) {
+      showError("Please select a cell to place your ship.", confirmPlacement);
+      return;
+    }
     try {
+      // attempt to place the ship on the gameboard
       currentPlayer.gameboard.placeShips(
         shipList[currentShipIndex],
         currentHeadCell.x,
@@ -80,8 +97,10 @@ export function setupGame(player1, player2) {
         ];
       drawShips(coords, boardDiv);
 
+      // move to the next ship or next player
       currentShipIndex++;
       if (currentShipIndex < shipList.length) {
+        // more ships to place for this player
         currentHeadCell = null;
         updatePlacementText();
         clearShipVisuals(boardSelector);
@@ -100,11 +119,13 @@ export function setupGame(player1, player2) {
         startGame(player1, player2);
       }
     } catch (err) {
-      showError(err.message);
+      // if placement is invalid, show error and allow retry
+      showError("Invalid placement, try again.", confirmPlacement);
     }
   }
-
+  // attach the preview click handler to the gameboard container
   domContent.addEventListener("click", handlePreviewClick);
+  // show the initial placement instructions
   updatePlacementText();
 }
 
