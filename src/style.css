@@ -82,3 +82,11 @@ header {
   border: 2px solid black;
   background-color: lightgrey;
 }
+
+.active-board {
+  box-shadow:
+    0 0 20px 6px #ff483b,
+    0 0 0 0px #333 inset;
+  z-index: 1;
+  transition: box-shadow 0.3s;
+}

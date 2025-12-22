@@ -36,6 +36,10 @@ export function setupGame(player1, player2) {
   let boardSelector = ".gameboard-left";
   let boardDiv = player1Div;
 
+  function handleEnterKey(event) {
+    if (event.key === "Enter") confirmPlacement();
+  }
+
   function updatePlacementText() {
     updateGameText(`
       <p>${currentPlayerString}, place your ${shipList[currentShipIndex]} on the board.</p>
@@ -43,6 +47,8 @@ export function setupGame(player1, player2) {
       <button class="confirm-button">Confirm</button>
     `);
     document.querySelector(".confirm-button").onclick = confirmPlacement;
+    // add keydown listener for Enter key
+    document.addEventListener("keydown", handleEnterKey);
   }
 
   // helper function to clear error messages
@@ -124,7 +130,8 @@ export function setupGame(player1, player2) {
         updatePlacementText();
         clearShipVisuals(boardSelector);
       } else {
-        // all ships placed, start game
+        // all ships placed, remove keydown listener and start game
+        document.removeEventListener("keydown", handleEnterKey);
         startGame(player1, player2);
       }
     } catch (err) {
@@ -141,17 +148,32 @@ export function setupGame(player1, player2) {
 export function startGame(player1, player2) {
   let currentTurn = "Player 1";
 
+  function setBoardHighlight() {
+    player1Div.classList.remove("active-board");
+    player2Div.classList.remove("active-board");
+    if (currentTurn === "Player 1") {
+      // player 1 attacks player 2's board
+      player2Div.classList.add("active-board");
+    } else {
+      // player 2 attacks player 1's board
+      player1Div.classList.add("active-board");
+    }
+  }
+
   updateGameText(`
       <p>Let the battle begin! ${currentTurn}, it is your turn.</p>
       <p>Click on the opponents board to try and hit their ship.</p>
       <p>A red square means you've landed a hit. A blue square means you've missed.</p>
     `);
 
+  setBoardHighlight();
+
   function alternateTurns() {
     currentTurn = currentTurn === "Player 1" ? "Player 2" : "Player 1";
     updateGameText(`
       <p>${currentTurn}, it is your turn.</p>
     `);
+    setBoardHighlight();
   }
 
   function handleAttackClick(event) {
