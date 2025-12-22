@@ -138,10 +138,37 @@ export function setupGame(player1, player2) {
   updatePlacementText();
 }
 
-function handleAttackClick(player1, player2) {
-  return function (event) {
+export function startGame(player1, player2) {
+  let currentTurn = "Player 1";
+
+  updateGameText(`
+      <p>Let the battle begin! ${currentTurn}, it is your turn.</p>
+      <p>Click on the opponents board to try and hit their ship.</p>
+      <p>A red square means you've landed a hit. A blue square means you've missed.</p>
+    `);
+
+  function alternateTurns() {
+    currentTurn = currentTurn === "Player 1" ? "Player 2" : "Player 1";
+    updateGameText(`
+      <p>${currentTurn}, it is your turn.</p>
+    `);
+  }
+
+  function handleAttackClick(event) {
     if (!event.target.classList.contains("grid-cell")) return;
     if (event.target.classList.contains("attacked")) return;
+
+    // only allow attacks on the opponent's board
+    if (
+      (currentTurn === "Player 1" &&
+        event.target.parentElement.classList.contains("gameboard-left")) ||
+      (currentTurn === "Player 2" &&
+        event.target.parentElement.classList.contains("gameboard-right"))
+    ) {
+      return;
+    }
+
+    // add attacked class to clicked cell
     event.target.classList.add("attacked");
 
     const x = Number(event.target.dataset.x);
@@ -165,15 +192,14 @@ function handleAttackClick(player1, player2) {
     }
 
     if (gameOver) {
-      console.log("Game Over");
-      domContent.removeEventListener(
-        "click",
-        handleAttackClick(player1, player2),
-      );
+      //console.log("Game Over");
+      updateGameText(`<p>Game Over! ${currentTurn} wins!</p>`);
+      domContent.removeEventListener("click", handleAttackClick);
+      return;
     }
-  };
-}
 
-export function startGame(player1, player2) {
-  domContent.addEventListener("click", handleAttackClick(player1, player2));
+    alternateTurns();
+  }
+
+  domContent.addEventListener("click", handleAttackClick);
 }
