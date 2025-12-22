@@ -45,9 +45,25 @@ export function setupGame(player1, player2) {
     document.querySelector(".confirm-button").onclick = confirmPlacement;
   }
 
+  // helper function to clear error messages
+  function clearError() {
+    const gameText = document.querySelector(".game-text");
+    // remove only error messages, not instructions/buttons
+    gameText.querySelectorAll(".error-message").forEach((p) => p.remove());
+  }
+
   function handlePreviewClick(event) {
     clearError();
     if (!event.target.classList.contains("grid-cell")) return;
+
+    // only allow clicks on the current player's board
+    if (
+      !event.target.parentElement.classList.contains(
+        boardSelector.replace(".", ""),
+      )
+    )
+      return;
+
     const x = Number(event.target.dataset.x);
     const y = Number(event.target.dataset.y);
 
@@ -65,13 +81,6 @@ export function setupGame(player1, player2) {
       [5, 4, 3, 3, 2][currentShipIndex],
       boardSelector,
     );
-  }
-
-  // helper function to clear error messages
-  function clearError() {
-    const gameText = document.querySelector(".game-text");
-    // remove only error messages, not instructions/buttons
-    gameText.querySelectorAll(".error-message").forEach((p) => p.remove());
   }
 
   function confirmPlacement() {

@@ -19,6 +19,12 @@ export function createGrid(rows, columns, container) {
   }
 }
 
+// clear all ship preview visuals
+export function clearShipVisuals(boardSelector) {
+  const cells = domContent.querySelectorAll(`${boardSelector} .grid-cell`);
+  cells.forEach((cell) => cell.classList.remove("ship-preview"));
+}
+
 // draw a ship preview
 export function drawShipPreview(x, y, orientation, shipLen, boardSelector) {
   clearShipVisuals(boardSelector);
@@ -37,19 +43,17 @@ export function drawShipPreview(x, y, orientation, shipLen, boardSelector) {
   }
 }
 
-// clear all ship preview visuals
-export function clearShipVisuals(boardSelector) {
-  const cells = domContent.querySelectorAll(`${boardSelector} .grid-cell`);
-  cells.forEach((cell) => cell.classList.remove("ship-preview"));
-}
-
 // draw placed ships
 export function drawShips(coords, container) {
   coords.forEach(([x, y]) => {
     const cell = container.querySelector(
       `.grid-cell[data-x="${x}"][data-y="${y}"]`,
     );
-    if (cell) cell.style.backgroundColor = "black";
+    if (cell) {
+      // remove preview styling
+      cell.classList.remove("ship-preview");
+      cell.classList.add("ship-placed");
+    }
   });
 }
 

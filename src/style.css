@@ -74,6 +74,10 @@ header {
   aspect-ratio: 1 / 1;
 }
 
+.ship-placed {
+  background-color: black;
+}
+
 .ship-preview {
   border: 2px solid black;
   background-color: lightgrey;
