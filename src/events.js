@@ -276,7 +276,12 @@ export function startGame(player1, player2) {
 
     if (gameOver) {
       //console.log("Game Over");
-      updateGameText(`<p>Game Over! ${currentTurn} wins!</p>`);
+      updateGameText(`
+        <p>Game Over! ${currentTurn} wins!</p>
+        <button class="play-again-button">Play Again</button>
+      `);
+      const playAgainBtn = document.querySelector(".play-again-button");
+      playAgainBtn.onclick = () => window.location.reload();
       domContent.removeEventListener("click", handleAttackClick);
       return;
     }

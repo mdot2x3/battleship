@@ -109,3 +109,17 @@ header {
   border-radius: 8px;
   text-align: center;
 }
+
+.play-again-button {
+  padding: 0.5em 0.5em;
+  font-size: 1em;
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.play-again-button:hover {
+  background: #388e3c;
+}
