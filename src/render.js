@@ -64,7 +64,7 @@ export function updateGameText(html) {
 
 // show an error message in the game text area
 // confirmPlacement function is passed to showError via the onConfirm parameter
-export function showError(message, onConfirm = null) {
+export function showError(message, onConfirm = null, onReset = null) {
   gameText.innerHTML += `<p class="error-message" style="color:red;">${message}</p>`;
   // re-attach confirm button handler if needed
   const confirmBtn = gameText.querySelector(".confirm-button");
@@ -72,5 +72,10 @@ export function showError(message, onConfirm = null) {
   if (confirmBtn && onConfirm) {
     // reassign confirmPlacement to the button's click event
     confirmBtn.onclick = onConfirm;
+  }
+  // re-attach reset button handler if needed
+  const resetBtn = gameText.querySelector(".reset-button");
+  if (resetBtn && onReset) {
+    resetBtn.onclick = onReset;
   }
 }

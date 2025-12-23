@@ -40,13 +40,23 @@ export function setupGame(player1, player2) {
     if (event.key === "Enter") confirmPlacement();
   }
 
+  // helper functions to show/hide modal
+  function showModal() {
+    document.querySelector("#reset-modal").style.display = "flex";
+  }
+  function hideModal() {
+    document.querySelector("#reset-modal").style.display = "none";
+  }
+
   function updatePlacementText() {
     updateGameText(`
       <p>${currentPlayerString}, place your ${shipList[currentShipIndex]} on the board.</p>
       <p>Click again to rotate. Click elsewhere to move. Confirm placement when ready.</p>
       <button class="confirm-button">Confirm</button>
+      <button class="reset-button">Reset</button>
     `);
     document.querySelector(".confirm-button").onclick = confirmPlacement;
+    document.querySelector(".reset-button").onclick = resetPlacement;
     // add keydown listener for Enter key
     document.addEventListener("keydown", handleEnterKey);
   }
@@ -94,7 +104,11 @@ export function setupGame(player1, player2) {
     clearError();
     // prevent user confirming without selecting a cell
     if (!currentHeadCell) {
-      showError("Please select a cell to place your ship.", confirmPlacement);
+      showError(
+        "Please select a cell to place your ship.",
+        confirmPlacement,
+        resetPlacement,
+      );
       return;
     }
     try {
@@ -136,9 +150,56 @@ export function setupGame(player1, player2) {
       }
     } catch (err) {
       // if placement is invalid, show error and allow retry
-      showError("Invalid placement, try again.", confirmPlacement);
+      showError(
+        "Invalid placement, try again.",
+        confirmPlacement,
+        resetPlacement,
+      );
     }
   }
+
+  // reset the current player's board and placement state
+  function resetPlacement() {
+    clearError();
+    showModal();
+    const confirmBtn = document.querySelector("#modal-confirm");
+    const cancelBtn = document.querySelector("#modal-cancel");
+
+    // remove any previous listeners to avoid stacking
+    confirmBtn.onclick = null;
+    cancelBtn.onclick = null;
+
+    confirmBtn.onclick = () => {
+      hideModal();
+      // clear the current player's board data
+      if (currentPlayerString === "Player 1") {
+        player1.gameboard = new player1.gameboard.constructor();
+        // clear the DOM board
+        boardDiv.innerHTML = "";
+        // re-create the grid for player 1
+        import("./render.js").then(({ createGrid }) => {
+          createGrid(10, 10, boardDiv);
+        });
+      } else {
+        player2.gameboard = new player2.gameboard.constructor();
+        boardDiv.innerHTML = "";
+        import("./render.js").then(({ createGrid }) => {
+          createGrid(10, 10, boardDiv);
+        });
+      }
+      // reset placement state
+      currentShipIndex = 0;
+      currentOrientation = "h";
+      currentHeadCell = null;
+      clearShipVisuals(boardSelector);
+      updatePlacementText();
+    };
+
+    cancelBtn.onclick = () => {
+      hideModal();
+    };
+  }
+
   // attach the preview click handler to the gameboard container
   domContent.addEventListener("click", handlePreviewClick);
   // show the initial placement instructions
