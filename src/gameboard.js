@@ -139,12 +139,39 @@ export class Gameboard {
         throw new Error("Invalid ship entry.");
     }
 
-    // check all segments are in-bounds
+    // gather all ship cell coordinates for the new ship
+    const newCoords = [];
     for (let i = 0; i < shipLength; i++) {
       const x = formatOrientation === "h" ? xCoord + i : xCoord;
       const y = formatOrientation === "v" ? yCoord + i : yCoord;
+      // check that all segments are in-bounds
       this.inBounds(x, y);
+      newCoords.push([x, y]);
     }
+
+    // gather all existing, placed ship coordinates (exclude current ship)
+    const allPlacedCoords = [];
+    // spread operator spreads the elements of this.shipOneCoordinates array into the allPlacedCoords array, and if the array is undef/null, it will push elements from an empty array instead, thus nothing is pushed
+    if (shipCoordinates !== "shipOneCoordinates")
+      allPlacedCoords.push(...(this.shipOneCoordinates || []));
+    if (shipCoordinates !== "shipTwoCoordinates")
+      allPlacedCoords.push(...(this.shipTwoCoordinates || []));
+    if (shipCoordinates !== "shipThreeCoordinates")
+      allPlacedCoords.push(...(this.shipThreeCoordinates || []));
+    if (shipCoordinates !== "shipFourCoordinates")
+      allPlacedCoords.push(...(this.shipFourCoordinates || []));
+    if (shipCoordinates !== "shipFiveCoordinates")
+      allPlacedCoords.push(...(this.shipFiveCoordinates || []));
+
+    // check for overlap (uses destructuring assignment with n meaning new, e meaning existing)
+    for (const [nx, ny] of newCoords) {
+      if (allPlacedCoords.some(([ex, ey]) => ex === nx && ey === ny)) {
+        throw new Error("Ships cannot overlap.");
+      }
+    }
+
+    // if no overlap is found, assign the coordinates to the board
+    this[shipCoordinates] = newCoords;
 
     return {
       shipLength: newShip.length,
