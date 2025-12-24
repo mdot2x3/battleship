@@ -68,6 +68,27 @@ header {
   border: 2px solid black;
 }
 
+.axis-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Special Elite", cursive;
+  font-size: 1.1em;
+  background: #f5f5f5;
+  color: #333;
+  border: none;
+  user-select: none;
+}
+.axis-x {
+  border-bottom: 2px solid #bbb;
+}
+.axis-y {
+  border-right: 2px solid #bbb;
+}
+.axis-corner {
+  background: #f5f5f5;
+  border: none;
+}
 .grid-cell {
   border: 1px solid #ccc;
   width: 100%;

@@ -6,14 +6,37 @@ export function createGrid(rows, columns, container) {
   // clear previous grid, if exists
   container.innerHTML = "";
   container.style.display = "grid";
-  container.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-  container.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-  for (let y = 1; y <= rows; y++) {
-    for (let x = 1; x <= columns; x++) {
-      const cell = document.createElement("div");
-      cell.classList.add("grid-cell");
-      cell.dataset.x = x;
-      cell.dataset.y = y;
+  // + 1 for labels
+  container.style.gridTemplateRows = `repeat(${rows + 1}, 1fr)`;
+  container.style.gridTemplateColumns = `repeat(${columns + 1}, 1fr)`;
+
+  // axis labels
+  const letters = "ABCDEFGHIJ".split("");
+
+  for (let y = 0; y <= rows; y++) {
+    for (let x = 0; x <= columns; x++) {
+      let cell = document.createElement("div");
+
+      // top-left corner: empty
+      if (x === 0 && y === 0) {
+        cell.classList.add("axis-corner");
+      }
+      // top row: x-axis labels (1-10)
+      else if (y === 0) {
+        cell.classList.add("axis-label", "axis-x");
+        cell.textContent = x;
+      }
+      // first column: y-axis labels (A-J)
+      else if (x === 0) {
+        cell.classList.add("axis-label", "axis-y");
+        cell.textContent = letters[y - 1];
+      }
+      // grid cell
+      else {
+        cell.classList.add("grid-cell");
+        cell.dataset.x = x;
+        cell.dataset.y = y;
+      }
       container.appendChild(cell);
     }
   }
