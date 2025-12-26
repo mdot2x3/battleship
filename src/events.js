@@ -12,14 +12,23 @@ const player2Div = document.querySelector(".gameboard-right");
 
 export function newGame(player1, player2) {
   updateGameText(`
-    <p>Click to Start: </p>
-    <button class="new-button">New Game</button>
+    <p>Choose a game mode:</p>
+    <button class="mode-button" data-mode="pvp">Player vs Player</button>
+    <button class="mode-button" data-mode="pvc">Player vs Computer</button>
   `);
-  const newButton = document.querySelector(".new-button");
-  newButton.addEventListener("click", () => setupGame(player1, player2));
+  document.querySelectorAll(".mode-button").forEach((btn) => {
+    btn.onclick = (e) => {
+      const mode = e.target.dataset.mode;
+      if (mode === "pvp") {
+        setupGame(player1, player2, "pvp");
+      } else if (mode === "pvc") {
+        setupGame(player1, player2, "pvc");
+      }
+    };
+  });
 }
 
-export function setupGame(player1, player2) {
+export function setupGame(player1, player2, mode = "pvp") {
   const shipList = [
     "Carrier",
     "Battleship",
@@ -134,6 +143,12 @@ export function setupGame(player1, player2) {
         updatePlacementText();
         clearShipVisuals(boardSelector);
       } else if (currentPlayerString === "Player 1") {
+        // hide player 1's ships if pvp mode
+        if (mode === "pvp") {
+          player1Div.querySelectorAll(".ship-placed").forEach((cell) => {
+            cell.classList.remove("ship-placed");
+          });
+        }
         // switch to Player 2
         currentPlayerString = "Player 2";
         currentPlayer = player2;
@@ -144,6 +159,12 @@ export function setupGame(player1, player2) {
         updatePlacementText();
         clearShipVisuals(boardSelector);
       } else {
+        // hide player 2's ships if pvp or pvc mode
+        if (mode === "pvp" || mode === "pvc") {
+          player2Div.querySelectorAll(".ship-placed").forEach((cell) => {
+            cell.classList.remove("ship-placed");
+          });
+        }
         // all ships placed, remove keydown listener and start game
         document.removeEventListener("keydown", handleEnterKey);
         startGame(player1, player2);
