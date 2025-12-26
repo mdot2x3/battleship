@@ -229,9 +229,10 @@ export function startGame(player1, player2) {
 
   setBoardHighlight();
 
-  function alternateTurns() {
+  function alternateTurns(sunkMessage = "") {
     currentTurn = currentTurn === "Player 1" ? "Player 2" : "Player 1";
     updateGameText(`
+      ${sunkMessage}
       <p>${currentTurn}, it is your turn.</p>
     `);
     setBoardHighlight();
@@ -257,26 +258,32 @@ export function startGame(player1, player2) {
     const x = Number(event.target.dataset.x);
     const y = Number(event.target.dataset.y);
 
-    let attackResult, gameOver;
+    let attackResult,
+      gameOver,
+      sunkMessage = "";
     if (event.target.parentElement.classList.contains("gameboard-left")) {
       attackResult = player1.gameboard.receiveAttack(x, y);
       event.target.style.backgroundColor =
-        attackResult === "miss" ? "blue" : "red";
-      if (attackResult === "sunk") console.log("Ship Sunk!");
+        attackResult.result === "miss" ? "blue" : "red";
+      if (attackResult.result === "sunk") {
+        sunkMessage = `<p>${currentTurn} has sunk the enemy's ${attackResult.shipName}!</p>`;
+      }
       gameOver = player1.gameboard.reportAllSunk();
     } else if (
       event.target.parentElement.classList.contains("gameboard-right")
     ) {
       attackResult = player2.gameboard.receiveAttack(x, y);
       event.target.style.backgroundColor =
-        attackResult === "miss" ? "blue" : "red";
-      if (attackResult === "sunk") console.log("Ship Sunk!");
+        attackResult.result === "miss" ? "blue" : "red";
+      if (attackResult.result === "sunk") {
+        sunkMessage = `<p>${currentTurn} has sunk the enemy's ${attackResult.shipName}!</p>`;
+      }
       gameOver = player2.gameboard.reportAllSunk();
     }
 
     if (gameOver) {
-      //console.log("Game Over");
       updateGameText(`
+        ${sunkMessage}
         <p>Game Over! ${currentTurn} wins!</p>
         <button class="play-again-button">Play Again</button>
       `);
@@ -286,7 +293,8 @@ export function startGame(player1, player2) {
       return;
     }
 
-    alternateTurns();
+    // switch turn before updating UI, if sunk exists pass in message
+    alternateTurns(sunkMessage);
   }
 
   domContent.addEventListener("click", handleAttackClick);

@@ -197,18 +197,26 @@ export class Gameboard {
       this.shipFiveObject,
     ];
 
+    const shipNames = [
+      "Carrier",
+      "Battleship",
+      "Cruiser",
+      "Submarine",
+      "Destroyer",
+    ];
+
     for (let i = 0; i < shipCoordProps.length; i++) {
       if (shipCoordProps[i].some(([x, y]) => x === xCoord && y === yCoord)) {
         shipObjProps[i].hit();
         if (shipObjProps[i].isSunk()) {
           this.sunkShipCount += 1;
-          return "sunk";
+          return { result: "sunk", shipName: shipNames[i] };
         }
-        return "hit";
+        return { result: "hit" };
       }
     }
     this.missCoordinates.push([xCoord, yCoord]);
-    return "miss";
+    return { result: "miss" };
   }
 
   reportAllSunk() {
