@@ -1,8 +1,9 @@
 import {
-  drawShipPreview,
-  clearShipVisuals,
-  drawShips,
+  renderShipPreview,
+  clearShipPreviews,
+  renderPlacedShips,
   updateGameText,
+  setBoardHighlight,
   showError,
 } from "./render.js";
 
@@ -99,7 +100,7 @@ export function setupGame(player1, player2, mode = "pvp") {
       currentHeadCell = { x, y };
       currentOrientation = "h";
     }
-    drawShipPreview(
+    renderShipPreview(
       x,
       y,
       currentOrientation,
@@ -133,7 +134,7 @@ export function setupGame(player1, player2, mode = "pvp") {
         currentPlayer.gameboard[
           `ship${["One", "Two", "Three", "Four", "Five"][currentShipIndex]}Coordinates`
         ];
-      drawShips(coords, boardDiv);
+      renderPlacedShips(coords, boardDiv);
 
       // move to the next ship or next player
       currentShipIndex++;
@@ -141,7 +142,7 @@ export function setupGame(player1, player2, mode = "pvp") {
         // more ships to place for this player
         currentHeadCell = null;
         updatePlacementText();
-        clearShipVisuals(boardSelector);
+        clearShipPreviews(boardSelector);
       } else if (currentPlayerString === "Player 1") {
         // hide player 1's ships if pvp mode
         if (mode === "pvp") {
@@ -157,7 +158,7 @@ export function setupGame(player1, player2, mode = "pvp") {
         currentShipIndex = 0;
         currentHeadCell = null;
         updatePlacementText();
-        clearShipVisuals(boardSelector);
+        clearShipPreviews(boardSelector);
       } else {
         // hide player 2's ships if pvp or pvc mode
         if (mode === "pvp" || mode === "pvc") {
@@ -212,7 +213,7 @@ export function setupGame(player1, player2, mode = "pvp") {
       currentShipIndex = 0;
       currentOrientation = "h";
       currentHeadCell = null;
-      clearShipVisuals(boardSelector);
+      clearShipPreviews(boardSelector);
       updatePlacementText();
     };
 
@@ -230,25 +231,13 @@ export function setupGame(player1, player2, mode = "pvp") {
 export function startGame(player1, player2) {
   let currentTurn = "Player 1";
 
-  function setBoardHighlight() {
-    player1Div.classList.remove("active-board");
-    player2Div.classList.remove("active-board");
-    if (currentTurn === "Player 1") {
-      // player 1 attacks player 2's board
-      player2Div.classList.add("active-board");
-    } else {
-      // player 2 attacks player 1's board
-      player1Div.classList.add("active-board");
-    }
-  }
-
   updateGameText(`
       <p>Let the battle begin! ${currentTurn}, it is your turn.</p>
       <p>Click on the opponents board to try and hit their ship.</p>
       <p>A red square means you've landed a hit. A blue square means you've missed.</p>
     `);
 
-  setBoardHighlight();
+  setBoardHighlight(player1Div, player2Div, currentTurn);
 
   function alternateTurns(sunkMessage = "") {
     currentTurn = currentTurn === "Player 1" ? "Player 2" : "Player 1";
@@ -256,7 +245,7 @@ export function startGame(player1, player2) {
       ${sunkMessage}
       <p>${currentTurn}, it is your turn.</p>
     `);
-    setBoardHighlight();
+    setBoardHighlight(player1Div, player2Div, currentTurn);
   }
 
   function handleAttackClick(event) {

@@ -43,14 +43,14 @@ export function createGrid(rows, columns, container) {
 }
 
 // clear all ship preview visuals
-export function clearShipVisuals(boardSelector) {
+export function clearShipPreviews(boardSelector) {
   const cells = domContent.querySelectorAll(`${boardSelector} .grid-cell`);
   cells.forEach((cell) => cell.classList.remove("ship-preview"));
 }
 
-// draw a ship preview
-export function drawShipPreview(x, y, orientation, shipLen, boardSelector) {
-  clearShipVisuals(boardSelector);
+// render a ship preview
+export function renderShipPreview(x, y, orientation, shipLen, boardSelector) {
+  clearShipPreviews(boardSelector);
   for (let i = 0; i < shipLen; i++) {
     let cell;
     if (orientation === "h") {
@@ -66,8 +66,8 @@ export function drawShipPreview(x, y, orientation, shipLen, boardSelector) {
   }
 }
 
-// draw placed ships
-export function drawShips(coords, container) {
+// render placed ships
+export function renderPlacedShips(coords, container) {
   coords.forEach(([x, y]) => {
     const cell = container.querySelector(
       `.grid-cell[data-x="${x}"][data-y="${y}"]`,
@@ -83,6 +83,18 @@ export function drawShips(coords, container) {
 // update the game text area
 export function updateGameText(html) {
   gameText.innerHTML = html;
+}
+
+export function setBoardHighlight(player1Div, player2Div, currentTurn) {
+  player1Div.classList.remove("active-board");
+  player2Div.classList.remove("active-board");
+  if (currentTurn === "Player 1") {
+    // player 1 attacks player 2's board
+    player2Div.classList.add("active-board");
+  } else {
+    // player 2 attacks player 1's board
+    player1Div.classList.add("active-board");
+  }
 }
 
 // show an error message in the game text area
