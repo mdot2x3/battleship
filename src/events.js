@@ -6,6 +6,7 @@ import {
   setBoardHighlight,
   showError,
 } from "./render.js";
+import { placeComputerShips } from "./comp-logic.js";
 
 const domContent = document.querySelector(".dom-content");
 const player1Div = document.querySelector(".gameboard-left");
@@ -129,7 +130,7 @@ export function setupGame(player1, player2, mode = "pvp") {
         currentHeadCell.y,
         currentOrientation,
       );
-      // draw the placed ship
+      // render the placed ship
       const coords =
         currentPlayer.gameboard[
           `ship${["One", "Two", "Three", "Four", "Five"][currentShipIndex]}Coordinates`
@@ -143,32 +144,49 @@ export function setupGame(player1, player2, mode = "pvp") {
         currentHeadCell = null;
         updatePlacementText();
         clearShipPreviews(boardSelector);
-      } else if (currentPlayerString === "Player 1") {
-        // hide player 1's ships if pvp mode
+        return;
+      }
+      // player 1 is now finished, confirm player 1 then run mode check
+      if (currentPlayerString === "Player 1") {
         if (mode === "pvp") {
+          // hide player 1's ships if pvp mode
           player1Div.querySelectorAll(".ship-placed").forEach((cell) => {
             cell.classList.remove("ship-placed");
           });
+          // switch to Player 2 for manual placement
+          currentPlayerString = "Player 2";
+          currentPlayer = player2;
+          boardSelector = ".gameboard-right";
+          boardDiv = player2Div;
+          currentShipIndex = 0;
+          currentHeadCell = null;
+          updatePlacementText();
+          clearShipPreviews(boardSelector);
+          return;
         }
-        // switch to Player 2
-        currentPlayerString = "Player 2";
-        currentPlayer = player2;
-        boardSelector = ".gameboard-right";
-        boardDiv = player2Div;
-        currentShipIndex = 0;
-        currentHeadCell = null;
-        updatePlacementText();
-        clearShipPreviews(boardSelector);
-      } else {
-        // hide player 2's ships if pvp or pvc mode
-        if (mode === "pvp" || mode === "pvc") {
+        if (mode === "pvc") {
+          // computer places ships
+          placeComputerShips(player2.gameboard);
+          // hide computer's ships
           player2Div.querySelectorAll(".ship-placed").forEach((cell) => {
             cell.classList.remove("ship-placed");
           });
+          // all ships placed for pvc, remove keydown listener and start game
+          document.removeEventListener("keydown", handleEnterKey);
+          startGame(player1, player2, mode);
+          return;
         }
-        // all ships placed, remove keydown listener and start game
+      }
+      // player 2 is not finished, in pvp mode
+      if (currentPlayerString === "Player 2" && mode === "pvp") {
+        // hide player 2's ships
+        player2Div.querySelectorAll(".ship-placed").forEach((cell) => {
+          cell.classList.remove("ship-placed");
+        });
+        // all ships placed for pvp, remove keydown listener and start game
         document.removeEventListener("keydown", handleEnterKey);
-        startGame(player1, player2);
+        startGame(player1, player2, mode);
+        return;
       }
     } catch (err) {
       // if placement is invalid, show error and allow retry
