@@ -43,12 +43,12 @@ describe("Gameboard", () => {
       ],
       shipOrientation: "v",
     });
-    expect(gameboard.placeShips("Cruiser", 8, 9, "V")).toStrictEqual({
+    expect(gameboard.placeShips("Cruiser", 8, 6, "V")).toStrictEqual({
       shipLength: 3,
       shipCoordinates: [
-        [8, 9],
-        [8, 10],
-        [8, 11],
+        [8, 6],
+        [8, 7],
+        [8, 8],
       ],
       shipOrientation: "v",
     });
@@ -61,11 +61,11 @@ describe("Gameboard", () => {
       ],
       shipOrientation: "h",
     });
-    expect(gameboard.placeShips("Destroyer", 10, 10, "h")).toStrictEqual({
+    expect(gameboard.placeShips("Destroyer", 9, 10, "h")).toStrictEqual({
       shipLength: 2,
       shipCoordinates: [
+        [9, 10],
         [10, 10],
-        [11, 10],
       ],
       shipOrientation: "h",
     });
@@ -79,12 +79,12 @@ describe("Gameboard", () => {
       ],
       shipOrientation: "h",
     });
-    expect(gameboard.placeShips("submarine", 9, 8, "H")).toStrictEqual({
+    expect(gameboard.placeShips("submarine", 4, 8, "H")).toStrictEqual({
       shipLength: 3,
       shipCoordinates: [
-        [9, 8],
-        [10, 8],
-        [11, 8],
+        [4, 8],
+        [5, 8],
+        [6, 8],
       ],
       shipOrientation: "h",
     });
@@ -107,12 +107,12 @@ describe("Gameboard", () => {
 
   test("Gameboard has a receiveAttack method", () => {
     gameboard.placeShips("Carrier", 2, 4, "h");
-    expect(gameboard.receiveAttack(3, 4)).toBe("hit");
+    expect(gameboard.receiveAttack(3, 4)).toStrictEqual({ result: "hit" });
   });
 
   test("receiveAttack method registers hits", () => {
     gameboard.placeShips("Carrier", 2, 4, "h");
-    expect(gameboard.receiveAttack(3, 4)).toBe("hit");
+    expect(gameboard.receiveAttack(3, 4)).toStrictEqual({ result: "hit" });
   });
 
   test("receiveAttack method calls the targeted Ship's hit method", () => {
@@ -127,18 +127,18 @@ describe("Gameboard", () => {
 
   test("receiveAttack method registers missed shots", () => {
     gameboard.placeShips("Carrier", 2, 4, "h");
-    expect(gameboard.receiveAttack(10, 10)).toBe("miss");
-    expect(gameboard.receiveAttack(1, 4)).toBe("miss");
-    expect(gameboard.receiveAttack(7, 4)).toBe("miss");
-    expect(gameboard.receiveAttack(1, 1)).toBe("miss");
+    expect(gameboard.receiveAttack(10, 10)).toStrictEqual({ result: "miss" });
+    expect(gameboard.receiveAttack(1, 4)).toStrictEqual({ result: "miss" });
+    expect(gameboard.receiveAttack(7, 4)).toStrictEqual({ result: "miss" });
+    expect(gameboard.receiveAttack(1, 1)).toStrictEqual({ result: "miss" });
   });
 
   test("receiveAttack method records all missed shots", () => {
     gameboard.placeShips("Carrier", 2, 4, "h");
-    expect(gameboard.receiveAttack(10, 10)).toBe("miss");
-    expect(gameboard.receiveAttack(1, 4)).toBe("miss");
-    expect(gameboard.receiveAttack(7, 4)).toBe("miss");
-    expect(gameboard.receiveAttack(1, 1)).toBe("miss");
+    expect(gameboard.receiveAttack(10, 10)).toStrictEqual({ result: "miss" });
+    expect(gameboard.receiveAttack(1, 4)).toStrictEqual({ result: "miss" });
+    expect(gameboard.receiveAttack(7, 4)).toStrictEqual({ result: "miss" });
+    expect(gameboard.receiveAttack(1, 1)).toStrictEqual({ result: "miss" });
     expect(gameboard.missCoordinates).toStrictEqual([
       [10, 10],
       [1, 4],
@@ -149,14 +149,20 @@ describe("Gameboard", () => {
 
   test("receiveAttack method reports a sunk ship", () => {
     gameboard.placeShips("Carrier", 2, 4, "h");
-    expect(gameboard.receiveAttack(2, 4)).toBe("hit");
-    expect(gameboard.receiveAttack(3, 4)).toBe("hit");
-    expect(gameboard.receiveAttack(4, 4)).toBe("hit");
-    expect(gameboard.receiveAttack(5, 4)).toBe("hit");
-    expect(gameboard.receiveAttack(6, 4)).toBe("sunk");
+    expect(gameboard.receiveAttack(2, 4)).toStrictEqual({ result: "hit" });
+    expect(gameboard.receiveAttack(3, 4)).toStrictEqual({ result: "hit" });
+    expect(gameboard.receiveAttack(4, 4)).toStrictEqual({ result: "hit" });
+    expect(gameboard.receiveAttack(5, 4)).toStrictEqual({ result: "hit" });
+    expect(gameboard.receiveAttack(6, 4)).toStrictEqual({
+      result: "sunk",
+      shipName: "Carrier",
+    });
     gameboard.placeShips("Destroyer", 5, 5, "v");
-    expect(gameboard.receiveAttack(5, 5)).toBe("hit");
-    expect(gameboard.receiveAttack(5, 6)).toBe("sunk");
+    expect(gameboard.receiveAttack(5, 5)).toStrictEqual({ result: "hit" });
+    expect(gameboard.receiveAttack(5, 6)).toStrictEqual({
+      result: "sunk",
+      shipName: "Destroyer",
+    });
   });
 
   test("reportAllSunk method reports false if not all ships are sunk", () => {
