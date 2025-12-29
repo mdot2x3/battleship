@@ -6,7 +6,7 @@ import {
   setBoardHighlight,
   showError,
 } from "./render.js";
-import { placeComputerShips } from "./comp-logic.js";
+import { placeComputerShips, handleComputerAttack } from "./comp-logic.js";
 
 const domContent = document.querySelector(".dom-content");
 const player1Div = document.querySelector(".gameboard-left");
@@ -49,14 +49,6 @@ export function setupGame(player1, player2, mode = "pvp") {
 
   function handleEnterKey(event) {
     if (event.key === "Enter") confirmPlacement();
-  }
-
-  // helper functions to show/hide modal
-  function showModal() {
-    document.querySelector("#reset-modal").style.display = "flex";
-  }
-  function hideModal() {
-    document.querySelector("#reset-modal").style.display = "none";
   }
 
   function updatePlacementText() {
@@ -198,6 +190,15 @@ export function setupGame(player1, player2, mode = "pvp") {
     }
   }
 
+  // helper functions to show/hide modal
+  function showModal() {
+    document.querySelector("#reset-modal").style.display = "flex";
+  }
+
+  function hideModal() {
+    document.querySelector("#reset-modal").style.display = "none";
+  }
+
   // reset the current player's board and placement state
   function resetPlacement() {
     clearError();
@@ -246,27 +247,42 @@ export function setupGame(player1, player2, mode = "pvp") {
   updatePlacementText();
 }
 
-export function startGame(player1, player2) {
+export function startGame(player1, player2, mode) {
   let currentTurn = "Player 1";
+  let gameOver = false;
 
   updateGameText(`
-      <p>Let the battle begin! ${currentTurn}, it is your turn.</p>
       <p>Click on the opponents board to try and hit their ship.</p>
       <p>A red square means you've landed a hit. A blue square means you've missed.</p>
+      <p>Click to begin the battle!</p>
+      <button class="start-button">Start</button>
     `);
+  // must wrap the call in an anonymous function so no event object is passed which was causing '[object PointerEvent]' to appear for ${sunkMessage} below, instead it will be the default empty string
+  document.querySelector(".start-button").onclick = () => nextTurn();
 
-  setBoardHighlight(player1Div, player2Div, currentTurn);
+  function nextTurn(sunkMessage = "") {
+    if (gameOver) return;
 
-  function alternateTurns(sunkMessage = "") {
-    currentTurn = currentTurn === "Player 1" ? "Player 2" : "Player 1";
+    // update UI for current turn
     updateGameText(`
       ${sunkMessage}
       <p>${currentTurn}, it is your turn.</p>
     `);
     setBoardHighlight(player1Div, player2Div, currentTurn);
+
+    // if computer's turn in pvc mode, make computer move after a short delay
+    if (mode === "pvc" && currentTurn === "Computer Player") {
+      setTimeout(() => {
+        const { x, y } = handleComputerAttack(player1.gameboard);
+        processAttack(x, y, player1, player1Div, "Player 1");
+      }, 700);
+    } else {
+      // wait for human player to click
+      domContent.addEventListener("click", handlePlayerAttack);
+    }
   }
 
-  function handleAttackClick(event) {
+  function handlePlayerAttack(event) {
     if (!event.target.classList.contains("grid-cell")) return;
     if (event.target.classList.contains("attacked")) return;
 
@@ -275,41 +291,50 @@ export function startGame(player1, player2) {
       (currentTurn === "Player 1" &&
         event.target.parentElement.classList.contains("gameboard-left")) ||
       (currentTurn === "Player 2" &&
-        event.target.parentElement.classList.contains("gameboard-right"))
+        event.target.parentElement.classList.contains("gameboard-right")) ||
+      (mode === "pvc" && currentTurn === "Computer Player")
     ) {
       return;
     }
 
-    // add attacked class to clicked cell
-    event.target.classList.add("attacked");
+    domContent.removeEventListener("click", handlePlayerAttack);
 
     const x = Number(event.target.dataset.x);
     const y = Number(event.target.dataset.y);
 
-    let attackResult,
-      gameOver,
-      sunkMessage = "";
-    if (event.target.parentElement.classList.contains("gameboard-left")) {
-      attackResult = player1.gameboard.receiveAttack(x, y);
-      event.target.style.backgroundColor =
+    if (mode === "pvc" && currentTurn === "Player 1") {
+      processAttack(x, y, player2, player2Div, "Computer Player");
+    } else if (mode === "pvp") {
+      const defender = currentTurn === "Player 1" ? player2 : player1;
+      const defenderDiv = currentTurn === "Player 1" ? player2Div : player1Div;
+      const nextPlayer = currentTurn === "Player 1" ? "Player 2" : "Player 1";
+      processAttack(x, y, defender, defenderDiv, nextPlayer);
+    }
+  }
+
+  function processAttack(x, y, defender, defenderDiv, nextPlayer) {
+    // call the defender's gameboard to process the attack and get the result
+    let attackResult = defender.gameboard.receiveAttack(x, y);
+
+    // find the attacked cell in the DOM and update its appearance
+    const cell = defenderDiv.querySelector(
+      `.grid-cell[data-x="${x}"][data-y="${y}"]`,
+    );
+    if (cell) {
+      cell.classList.add("attacked");
+      cell.style.backgroundColor =
         attackResult.result === "miss" ? "blue" : "red";
-      if (attackResult.result === "sunk") {
-        sunkMessage = `<p>${currentTurn} has sunk the enemy's ${attackResult.shipName}!</p>`;
-      }
-      gameOver = player1.gameboard.reportAllSunk();
-    } else if (
-      event.target.parentElement.classList.contains("gameboard-right")
-    ) {
-      attackResult = player2.gameboard.receiveAttack(x, y);
-      event.target.style.backgroundColor =
-        attackResult.result === "miss" ? "blue" : "red";
-      if (attackResult.result === "sunk") {
-        sunkMessage = `<p>${currentTurn} has sunk the enemy's ${attackResult.shipName}!</p>`;
-      }
-      gameOver = player2.gameboard.reportAllSunk();
     }
 
-    if (gameOver) {
+    // prepare a message if a ship was sunk during this attack
+    let sunkMessage = "";
+    if (attackResult.result === "sunk") {
+      sunkMessage = `<p>${currentTurn} has sunk the enemy's ${attackResult.shipName}!</p>`;
+    }
+
+    // check if all defender's ships are sunk (game over)
+    if (defender.gameboard.reportAllSunk()) {
+      gameOver = true;
       updateGameText(`
         ${sunkMessage}
         <p>Game Over! ${currentTurn} wins!</p>
@@ -317,13 +342,11 @@ export function startGame(player1, player2) {
       `);
       const playAgainBtn = document.querySelector(".play-again-button");
       playAgainBtn.onclick = () => window.location.reload();
-      domContent.removeEventListener("click", handleAttackClick);
       return;
     }
 
-    // switch turn before updating UI, if sunk exists pass in message
-    alternateTurns(sunkMessage);
+    // switch to the next player's turn and update the UI, passing any sunk message
+    currentTurn = nextPlayer;
+    nextTurn(sunkMessage);
   }
-
-  domContent.addEventListener("click", handleAttackClick);
 }
