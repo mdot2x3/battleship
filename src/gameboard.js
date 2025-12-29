@@ -19,6 +19,7 @@ export class Gameboard {
     this.shipThreeObject = undefined;
     this.shipFourObject = undefined;
     this.shipFiveObject = undefined;
+    this.hitCoordinates = [];
     this.missCoordinates = [];
     this.sunkShipCount = 0;
   }
@@ -222,6 +223,7 @@ export class Gameboard {
           this.sunkShipCount += 1;
           return { result: "sunk", shipName: shipNames[i] };
         }
+        this.hitCoordinates.push([xCoord, yCoord]);
         return { result: "hit" };
       }
     }
@@ -233,6 +235,14 @@ export class Gameboard {
     if (this.sunkShipCount >= 5) {
       return true;
     }
+    return false;
+  }
+
+  wasCellAttacked(x, y) {
+    if (this.missCoordinates.some(([mx, my]) => mx === x && my === y))
+      return true;
+    if (this.hitCoordinates.some(([hx, hy]) => hx === x && hy === y))
+      return true;
     return false;
   }
 }

@@ -21,3 +21,20 @@ export function placeComputerShips(gameboard) {
     }
   }
 }
+
+export function handleComputerAttack(gameboard) {
+  // find all unattacked cells
+  const unattacked = [];
+  for (let x = 1; x <= 10; x++) {
+    for (let y = 1; y <= 10; y++) {
+      // if wasCellAttacked is not false (aka it is true)
+      if (!gameboard.wasCellAttacked(x, y)) {
+        unattacked.push([x, y]);
+      }
+    }
+  }
+  // pick one array x/y pair from a random index
+  // uses destructuring to create variables
+  const [x, y] = unattacked[Math.floor(Math.random() * unattacked.length)];
+  return { x, y };
+}
