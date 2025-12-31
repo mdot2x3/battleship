@@ -6,7 +6,12 @@ import {
   setBoardHighlight,
   showError,
 } from "./render.js";
-import { placeComputerShips, handleComputerAttack } from "./comp-logic.js";
+import {
+  placeComputerShips,
+  handleComputerAttack,
+  computerAttackState,
+  updateComputerAttackState,
+} from "./comp-logic.js";
 
 const domContent = document.querySelector(".dom-content");
 const player1Div = document.querySelector(".gameboard-left");
@@ -330,6 +335,11 @@ export function startGame(player1, player2, mode) {
     let sunkMessage = "";
     if (attackResult.result === "sunk") {
       sunkMessage = `<p>${currentTurn} has sunk the enemy's ${attackResult.shipName}!</p>`;
+    }
+
+    // update computer attack state if it's the computer's turn
+    if (mode === "pvc" && currentTurn === "Computer Player") {
+      updateComputerAttackState(attackResult.result, x, y);
     }
 
     // check if all defender's ships are sunk (game over)
