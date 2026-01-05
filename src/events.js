@@ -7,10 +7,11 @@ import {
   showError,
 } from "./render.js";
 import {
-  placeComputerShips,
-  handleComputerAttack,
-  computerAttackState,
+  computerAttackEasy,
+  computerAttackMedium,
+  computerAttackHard,
   updateComputerAttackState,
+  placeComputerShips,
 } from "./comp-logic.js";
 
 const domContent = document.querySelector(".dom-content");
@@ -29,13 +30,31 @@ export function newGame(player1, player2) {
       if (mode === "pvp") {
         setupGame(player1, player2, "pvp");
       } else if (mode === "pvc") {
-        setupGame(player1, player2, "pvc");
+        // show difficulty selection
+        updateGameText(`
+          <p>Select Computer Difficulty:</p>
+          <button class="difficulty-button" data-difficulty="easy">Easy</button>
+          <button class="difficulty-button" data-difficulty="medium">Medium</button>
+          <button class="difficulty-button" data-difficulty="hard">Hard</button>
+        `);
+        document.querySelectorAll(".difficulty-button").forEach((dbtn) => {
+          dbtn.onclick = (ev) => {
+            // .difficulty draws from the post-hyphenated string in data-""
+            const difficulty = ev.target.dataset.difficulty;
+            setupGame(player1, player2, "pvc", difficulty);
+          };
+        });
       }
     };
   });
 }
 
-export function setupGame(player1, player2, mode = "pvp") {
+export function setupGame(
+  player1,
+  player2,
+  mode = "pvp",
+  difficulty = "medium",
+) {
   const shipList = [
     "Carrier",
     "Battleship",
@@ -170,7 +189,7 @@ export function setupGame(player1, player2, mode = "pvp") {
           });
           // all ships placed for pvc, remove keydown listener and start game
           document.removeEventListener("keydown", handleEnterKey);
-          startGame(player1, player2, mode);
+          startGame(player1, player2, mode, difficulty);
           return;
         }
       }
@@ -252,7 +271,7 @@ export function setupGame(player1, player2, mode = "pvp") {
   updatePlacementText();
 }
 
-export function startGame(player1, player2, mode) {
+export function startGame(player1, player2, mode, difficulty = "medium") {
   let currentTurn = "Player 1";
   let gameOver = false;
 
@@ -278,11 +297,20 @@ export function startGame(player1, player2, mode) {
     // if computer's turn in pvc mode, make computer move after a short delay
     if (mode === "pvc" && currentTurn === "Computer Player") {
       setTimeout(() => {
-        const { x, y } = handleComputerAttack(player1.gameboard);
+        let attack;
+        if (difficulty === "easy") {
+          attack = computerAttackEasy(player1.gameboard);
+        } else if (difficulty === "medium") {
+          attack = computerAttackMedium(player1.gameboard);
+        } else if (difficulty === "hard") {
+          attack = computerAttackHard(player1.gameboard);
+        }
+        // no moves left
+        if (!attack) return;
+        const { x, y } = attack;
         processAttack(x, y, player1, player1Div, "Player 1");
       }, 700);
     } else {
-      // wait for human player to click
       domContent.addEventListener("click", handlePlayerAttack);
     }
   }
