@@ -21,6 +21,7 @@ export class Gameboard {
     this.shipFiveObject = undefined;
     this.hitCoordinates = [];
     this.missCoordinates = [];
+    this.sunkShips = new Set();
     this.sunkShipCount = 0;
   }
 
@@ -193,6 +194,12 @@ export class Gameboard {
 
   receiveAttack(xCoord, yCoord) {
     this.inBounds(xCoord, yCoord);
+
+    // prevent double-attacks
+    if (this.wasCellAttacked(xCoord, yCoord)) {
+      return { result: "already-attacked" };
+    }
+
     const shipCoordProps = [
       this.shipOneCoordinates,
       this.shipTwoCoordinates,
@@ -219,7 +226,8 @@ export class Gameboard {
     for (let i = 0; i < shipCoordProps.length; i++) {
       if (shipCoordProps[i].some(([x, y]) => x === xCoord && y === yCoord)) {
         shipObjProps[i].hit();
-        if (shipObjProps[i].isSunk()) {
+        if (shipObjProps[i].isSunk() && !this.sunkShips.has(i)) {
+          this.sunkShips.add(i);
           this.sunkShipCount += 1;
           return { result: "sunk", shipName: shipNames[i] };
         }
