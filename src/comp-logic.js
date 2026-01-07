@@ -55,6 +55,7 @@ export function updateComputerAttackState(result, x, y) {
       computerAttackState.mode = "target";
       computerAttackState.lastHit = { x, y };
     } else if (computerAttackState.mode === "target") {
+      // if already in target mode, just update lastHit
       computerAttackState.lastHit = { x, y };
     }
   } else if (result === "sunk") {

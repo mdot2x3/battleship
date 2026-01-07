@@ -1,3 +1,5 @@
+import { Player } from "./player.js";
+import { createGrid } from "./render.js";
 import {
   renderShipPreview,
   clearShipPreviews,
@@ -18,7 +20,12 @@ const domContent = document.querySelector(".dom-content");
 const player1Div = document.querySelector(".gameboard-left");
 const player2Div = document.querySelector(".gameboard-right");
 
-export function newGame(player1, player2) {
+export function newGame() {
+  // create default grids (10x10) on launch
+  const player1Div = document.querySelector(".gameboard-left");
+  const player2Div = document.querySelector(".gameboard-right");
+  createGrid(10, 10, player1Div);
+  createGrid(10, 10, player2Div);
   updateGameText(`
     <p>Choose a game mode:</p>
     <button class="mode-button" data-mode="pvp">Player vs Player</button>
@@ -27,6 +34,11 @@ export function newGame(player1, player2) {
   document.querySelectorAll(".mode-button").forEach((btn) => {
     btn.onclick = (e) => {
       const mode = e.target.dataset.mode;
+      // create players after mode is chosen
+      const player1 = new Player();
+      player1.makePlayer("real");
+      const player2 = new Player();
+      player2.makePlayer(mode === "pvc" ? "computer" : "real");
       if (mode === "pvp") {
         setupGame(player1, player2, "pvp");
       } else if (mode === "pvc") {
