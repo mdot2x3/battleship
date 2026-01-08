@@ -47,11 +47,22 @@ export function clearShipPreviews(boardSelector) {
   const cells = domContent.querySelectorAll(`${boardSelector} .grid-cell`);
   cells.forEach((cell) => {
     cell.classList.remove("ship-preview", "ship-preview-active");
+    cell.removeAttribute("draggable");
   });
 }
 
 // render a ship preview
 export function renderShipPreview(x, y, orientation, shipLen, boardSelector) {
+  // prevent rendering if 'head cell' is out of bounds
+  // clamp head cell so the entire ship fits within the grid bounds
+  if (orientation === "h") {
+    x = Math.max(1, Math.min(x, 11 - shipLen));
+    y = Math.max(1, Math.min(y, 10));
+  } else {
+    x = Math.max(1, Math.min(x, 10));
+    y = Math.max(1, Math.min(y, 11 - shipLen));
+  }
+
   clearShipPreviews(boardSelector);
   for (let i = 0; i < shipLen; i++) {
     let cell;
@@ -66,6 +77,8 @@ export function renderShipPreview(x, y, orientation, shipLen, boardSelector) {
     }
     if (cell) {
       cell.classList.add("ship-preview", "ship-preview-active");
+      // add draggable attribute on any cells with above "ship-preview-active" class
+      cell.setAttribute("draggable", "true");
     }
   }
 }

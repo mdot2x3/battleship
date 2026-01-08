@@ -125,11 +125,26 @@ export function setupGame(
     // if clicking any cell of the current ship preview, rotate (pivot from head cell)
     if (event.target.classList.contains("ship-preview-active")) {
       currentOrientation = currentOrientation === "h" ? "v" : "h";
+      const shipLen = [5, 4, 3, 3, 2][currentShipIndex];
+      // clamp head cell so the entire ship fits within the grid bounds before rendering
+      if (currentOrientation === "h") {
+        currentHeadCell.x = Math.max(
+          1,
+          Math.min(currentHeadCell.x, 11 - shipLen),
+        );
+        currentHeadCell.y = Math.max(1, Math.min(currentHeadCell.y, 10));
+      } else {
+        currentHeadCell.x = Math.max(1, Math.min(currentHeadCell.x, 10));
+        currentHeadCell.y = Math.max(
+          1,
+          Math.min(currentHeadCell.y, 11 - shipLen),
+        );
+      }
       renderShipPreview(
         currentHeadCell.x,
         currentHeadCell.y,
         currentOrientation,
-        [5, 4, 3, 3, 2][currentShipIndex],
+        shipLen,
         boardSelector,
       );
       return;
@@ -142,6 +157,70 @@ export function setupGame(
       y,
       currentOrientation,
       [5, 4, 3, 3, 2][currentShipIndex],
+      boardSelector,
+    );
+  }
+
+  // add drag event listeners
+  // triggered when the user starts dragging a ship preview cell
+  boardDiv.addEventListener("dragstart", handleDragStart);
+  // triggered when a dragged item is moved over a grid cell
+  boardDiv.addEventListener("dragover", handleDragOver);
+  // triggered when the user drops the ship preview onto a grid cell
+  boardDiv.addEventListener("drop", handleDrop);
+
+  function handleDragStart(event) {
+    // checks if the dragged cell is part of the current ship preview
+    if (!event.target.classList.contains("ship-preview-active")) return;
+    // store offset between head cell and dragged cell
+    const dragX = Number(event.target.dataset.x);
+    const dragY = Number(event.target.dataset.y);
+    // store offset in the drag event’s data, used later on drop
+    event.dataTransfer.setData(
+      "text/plain",
+      JSON.stringify({
+        offsetX: dragX - currentHeadCell.x,
+        offsetY: dragY - currentHeadCell.y,
+      }),
+    );
+  }
+
+  function handleDragOver(event) {
+    // allows dropping, not allowed by default
+    event.preventDefault();
+  }
+
+  function handleDrop(event) {
+    event.preventDefault();
+    // only allow drop on valid grid cells (not axis labels)
+    if (!event.target.classList.contains("grid-cell")) return;
+
+    // retrieves the drop cell’s coordinates and the stored offset from data
+    const dropX = Number(event.target.dataset.x);
+    const dropY = Number(event.target.dataset.y);
+    const { offsetX, offsetY } = JSON.parse(
+      event.dataTransfer.getData("text/plain"),
+    );
+    // calculate new head cell position
+    // clamp the head cell to within the grid bounds in drag/drop and rotation handlers
+    let newHeadX = dropX - offsetX;
+    let newHeadY = dropY - offsetY;
+    const shipLen = [5, 4, 3, 3, 2][currentShipIndex];
+
+    if (currentOrientation === "h") {
+      newHeadX = Math.max(1, Math.min(newHeadX, 11 - shipLen));
+      newHeadY = Math.max(1, Math.min(newHeadY, 10));
+    } else {
+      newHeadX = Math.max(1, Math.min(newHeadX, 10));
+      newHeadY = Math.max(1, Math.min(newHeadY, 11 - shipLen));
+    }
+    // update currentHeadCell and re-render ship preview
+    currentHeadCell = { x: newHeadX, y: newHeadY };
+    renderShipPreview(
+      newHeadX,
+      newHeadY,
+      currentOrientation,
+      shipLen,
       boardSelector,
     );
   }
