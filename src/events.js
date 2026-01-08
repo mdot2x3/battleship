@@ -122,13 +122,21 @@ export function setupGame(
     const x = Number(event.target.dataset.x);
     const y = Number(event.target.dataset.y);
 
-    // toggle orientation if clicking the same cell, otherwise reset orientation
-    if (currentHeadCell && currentHeadCell.x === x && currentHeadCell.y === y) {
+    // if clicking any cell of the current ship preview, rotate (pivot from head cell)
+    if (event.target.classList.contains("ship-preview-active")) {
       currentOrientation = currentOrientation === "h" ? "v" : "h";
-    } else {
-      currentHeadCell = { x, y };
-      currentOrientation = "h";
+      renderShipPreview(
+        currentHeadCell.x,
+        currentHeadCell.y,
+        currentOrientation,
+        [5, 4, 3, 3, 2][currentShipIndex],
+        boardSelector,
+      );
+      return;
     }
+    // otherwise, move the ship preview to the clicked cell (reset orientation to horizontal)
+    currentHeadCell = { x, y };
+    currentOrientation = "h";
     renderShipPreview(
       x,
       y,

@@ -45,7 +45,9 @@ export function createGrid(rows, columns, container) {
 // clear all ship preview visuals
 export function clearShipPreviews(boardSelector) {
   const cells = domContent.querySelectorAll(`${boardSelector} .grid-cell`);
-  cells.forEach((cell) => cell.classList.remove("ship-preview"));
+  cells.forEach((cell) => {
+    cell.classList.remove("ship-preview", "ship-preview-active");
+  });
 }
 
 // render a ship preview
@@ -62,7 +64,9 @@ export function renderShipPreview(x, y, orientation, shipLen, boardSelector) {
         `${boardSelector} .grid-cell[data-x="${x}"][data-y="${y + i}"]`,
       );
     }
-    if (cell) cell.classList.add("ship-preview");
+    if (cell) {
+      cell.classList.add("ship-preview", "ship-preview-active");
+    }
   }
 }
 
