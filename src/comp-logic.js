@@ -97,7 +97,7 @@ export function computerAttackEasy(gameboard) {
   // pick one array x/y pair from a random index
   // uses destructuring to create variables
   const [x, y] = unattacked[Math.floor(Math.random() * unattacked.length)];
-  // final guard: ensure cell is not already attacked
+  // final guard to ensure cell is not already attacked
   if (gameboard.wasCellAttacked(x, y)) return computerAttackEasy(gameboard);
   return { x, y };
 }
@@ -120,7 +120,7 @@ export function computerAttackMedium(gameboard) {
       return computerAttackEasy(gameboard);
     }
     const [x, y] = candidates[Math.floor(Math.random() * candidates.length)];
-    // final guard: ensure cell is not already attacked
+    // final guard to ensure cell is not already attacked
     if (gameboard.wasCellAttacked(x, y)) return computerAttackMedium(gameboard);
     return { x, y };
   }
@@ -157,7 +157,7 @@ export function computerAttackMedium(gameboard) {
       computerAttackState.mode = "random";
       return computerAttackEasy(gameboard);
     }
-    // final guard: ensure cell is not already attacked
+    // final guard to ensure cell is not already attacked
     if (gameboard.wasCellAttacked(nx, ny))
       return computerAttackMedium(gameboard);
     return { x: nx, y: ny };
@@ -182,7 +182,7 @@ export function computerAttackHard(gameboard) {
       return computerAttackEasy(gameboard);
     }
     const [x, y] = candidates[Math.floor(Math.random() * candidates.length)];
-    // final guard: ensure cell is not already attacked
+    // final guard to ensure cell is not already attacked
     if (gameboard.wasCellAttacked(x, y)) return computerAttackHard(gameboard);
     return { x, y };
   }
@@ -209,7 +209,7 @@ export function computerAttackHard(gameboard) {
       ny <= 10 &&
       !gameboard.wasCellAttacked(nx, ny)
     ) {
-      // final guard: ensure cell is not already attacked
+      // final guard to ensure cell is not already attacked
       if (gameboard.wasCellAttacked(nx, ny))
         return computerAttackHard(gameboard);
       return { x: nx, y: ny };
@@ -235,7 +235,7 @@ export function computerAttackHard(gameboard) {
       oy <= 10 &&
       !gameboard.wasCellAttacked(ox, oy)
     ) {
-      // final guard: ensure cell is not already attacked
+      // final guard to ensure cell is not already attacked
       if (gameboard.wasCellAttacked(ox, oy))
         return computerAttackHard(gameboard);
       computerAttackState.lastHit = { x: ox, y: oy };
@@ -250,7 +250,7 @@ export function computerAttackHard(gameboard) {
         upCell[1] <= 10 &&
         !gameboard.wasCellAttacked(upCell[0], upCell[1])
       ) {
-        // final guard: ensure cell is not already attacked
+        // final guard to ensure cell is not already attacked
         if (gameboard.wasCellAttacked(upCell[0], upCell[1]))
           return computerAttackHard(gameboard);
         computerAttackState.lastHit = { x: upCell[0], y: upCell[1] };
@@ -262,7 +262,7 @@ export function computerAttackHard(gameboard) {
         downCell[1] <= 10 &&
         !gameboard.wasCellAttacked(downCell[0], downCell[1])
       ) {
-        // final guard: ensure cell is not already attacked
+        // final guard to ensure cell is not already attacked
         if (gameboard.wasCellAttacked(downCell[0], downCell[1]))
           return computerAttackHard(gameboard);
         computerAttackState.lastHit = { x: downCell[0], y: downCell[1] };
@@ -276,7 +276,7 @@ export function computerAttackHard(gameboard) {
         leftCell[0] <= 10 &&
         !gameboard.wasCellAttacked(leftCell[0], leftCell[1])
       ) {
-        // final guard: ensure cell is not already attacked
+        // final guard to ensure cell is not already attacked
         if (gameboard.wasCellAttacked(leftCell[0], leftCell[1]))
           return computerAttackHard(gameboard);
         computerAttackState.lastHit = { x: leftCell[0], y: leftCell[1] };
@@ -288,7 +288,7 @@ export function computerAttackHard(gameboard) {
         rightCell[0] <= 10 &&
         !gameboard.wasCellAttacked(rightCell[0], rightCell[1])
       ) {
-        // final guard: ensure cell is not already attacked
+        // final guard to ensure cell is not already attacked
         if (gameboard.wasCellAttacked(rightCell[0], rightCell[1]))
           return computerAttackHard(gameboard);
         computerAttackState.lastHit = { x: rightCell[0], y: rightCell[1] };

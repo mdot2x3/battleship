@@ -170,8 +170,16 @@ export function setupGame(
   boardDiv.addEventListener("drop", handleDrop);
 
   function handleDragStart(event) {
-    // checks if the dragged cell is part of the current ship preview
-    if (!event.target.classList.contains("ship-preview-active")) return;
+    // guard to ensure event.target exists and is a valid element with a classList property
+    if (
+      !event.target ||
+      !event.target.classList ||
+      !event.target.classList.contains("ship-preview-active")
+    ) {
+      event.preventDefault();
+      return;
+    }
+
     // store offset between head cell and dragged cell
     const dragX = Number(event.target.dataset.x);
     const dragY = Number(event.target.dataset.y);
@@ -195,12 +203,29 @@ export function setupGame(
     // only allow drop on valid grid cells (not axis labels)
     if (!event.target.classList.contains("grid-cell")) return;
 
-    // retrieves the drop cell’s coordinates and the stored offset from data
+    // try to parse drag data safely to prevent errors
+    let dragData;
+    try {
+      // check for valid drag data before parsing, preventing errors if empty
+      dragData = event.dataTransfer.getData("text/plain");
+      if (!dragData) return;
+      dragData = JSON.parse(dragData);
+      // optionally, check dragData has expected properties
+      if (
+        typeof dragData.offsetX !== "number" ||
+        typeof dragData.offsetY !== "number"
+      ) {
+        return;
+      }
+    } catch (err) {
+      // invalid or unexpected drag data, ignore this drop
+      return;
+    }
+
+    // retrieve the drop cell’s coordinates and the stored offset from data
     const dropX = Number(event.target.dataset.x);
     const dropY = Number(event.target.dataset.y);
-    const { offsetX, offsetY } = JSON.parse(
-      event.dataTransfer.getData("text/plain"),
-    );
+    const { offsetX, offsetY } = dragData;
     // calculate new head cell position
     // clamp the head cell to within the grid bounds in drag/drop and rotation handlers
     let newHeadX = dropX - offsetX;
