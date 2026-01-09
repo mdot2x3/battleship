@@ -7,6 +7,7 @@ import {
   updateGameText,
   setBoardHighlight,
   showError,
+  createShipDragPreview,
 } from "./render.js";
 import {
   computerAttackEasy,
@@ -176,6 +177,38 @@ export function setupGame(
         offsetY: dragY - currentHeadCell.y,
       }),
     );
+
+    // collect data for the custom ship drag preview
+    // get ship length
+    const shipLen = [5, 4, 3, 3, 2][currentShipIndex];
+    // get actual grid cell size for use with ship drag preview
+    const gridCell = event.target;
+    const cellRect = gridCell.getBoundingClientRect();
+    // assumes square cells
+    const cellSize = cellRect.width;
+    // calculate offset in ship drag preview (cursor distance from head cell)
+    const offset =
+      currentOrientation === "h"
+        ? dragX - currentHeadCell.x
+        : dragY - currentHeadCell.y;
+
+    // create the custom ship drag preview
+    const dragPreview = createShipDragPreview(
+      shipLen,
+      currentOrientation,
+      cellSize,
+    );
+    // set ship drag preview so the grabbed cell is under the cursor and centered
+    const offsetX =
+      currentOrientation === "h"
+        ? offset * cellSize + cellSize / 2
+        : cellSize / 2;
+    const offsetY =
+      currentOrientation === "v"
+        ? offset * cellSize + cellSize / 2
+        : cellSize / 2;
+    event.dataTransfer.setDragImage(dragPreview, offsetX, offsetY);
+    setTimeout(() => document.body.removeChild(dragPreview), 0);
   }
 
   function handleDragOver(event) {

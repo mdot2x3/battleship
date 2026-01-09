@@ -85,6 +85,27 @@ export function renderShipPreview(x, y, orientation, shipLen, boardSelector) {
   return { x, y };
 }
 
+export function createShipDragPreview(shipLen, orientation, cellSize = 32) {
+  const dragPreview = document.createElement("div");
+  dragPreview.style.display = "flex";
+  dragPreview.style.flexDirection = orientation === "h" ? "row" : "column";
+  dragPreview.style.position = "absolute";
+  dragPreview.style.top = "-9999px";
+  for (let i = 0; i < shipLen; i++) {
+    const cell = document.createElement("div");
+    // match drag preview to grid cell size
+    cell.style.width = `${cellSize}px`;
+    cell.style.height = `${cellSize}px`;
+    cell.style.background = "#ccc";
+    cell.style.border = "2px solid #333";
+    cell.style.opacity = "0.8";
+    cell.style.boxSizing = "border-box";
+    dragPreview.appendChild(cell);
+  }
+  document.body.appendChild(dragPreview);
+  return dragPreview;
+}
+
 // render placed ships
 export function renderPlacedShips(coords, container) {
   coords.forEach(([x, y]) => {
