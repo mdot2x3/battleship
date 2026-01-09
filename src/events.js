@@ -126,21 +126,7 @@ export function setupGame(
     if (event.target.classList.contains("ship-preview-active")) {
       currentOrientation = currentOrientation === "h" ? "v" : "h";
       const shipLen = [5, 4, 3, 3, 2][currentShipIndex];
-      // clamp head cell so the entire ship fits within the grid bounds before rendering
-      if (currentOrientation === "h") {
-        currentHeadCell.x = Math.max(
-          1,
-          Math.min(currentHeadCell.x, 11 - shipLen),
-        );
-        currentHeadCell.y = Math.max(1, Math.min(currentHeadCell.y, 10));
-      } else {
-        currentHeadCell.x = Math.max(1, Math.min(currentHeadCell.x, 10));
-        currentHeadCell.y = Math.max(
-          1,
-          Math.min(currentHeadCell.y, 11 - shipLen),
-        );
-      }
-      renderShipPreview(
+      currentHeadCell = renderShipPreview(
         currentHeadCell.x,
         currentHeadCell.y,
         currentOrientation,
@@ -149,10 +135,9 @@ export function setupGame(
       );
       return;
     }
-    // otherwise, move the ship preview to the clicked cell (reset orientation to horizontal)
-    currentHeadCell = { x, y };
+    // otherwise, move the ship preview to the clicked cell (reset orientation to h)
     currentOrientation = "h";
-    renderShipPreview(
+    currentHeadCell = renderShipPreview(
       x,
       y,
       currentOrientation,
@@ -240,8 +225,7 @@ export function setupGame(
       newHeadY = Math.max(1, Math.min(newHeadY, 11 - shipLen));
     }
     // update currentHeadCell and re-render ship preview
-    currentHeadCell = { x: newHeadX, y: newHeadY };
-    renderShipPreview(
+    currentHeadCell = renderShipPreview(
       newHeadX,
       newHeadY,
       currentOrientation,

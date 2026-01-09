@@ -53,7 +53,7 @@ export function clearShipPreviews(boardSelector) {
 
 // render a ship preview
 export function renderShipPreview(x, y, orientation, shipLen, boardSelector) {
-  // prevent rendering if 'head cell' is out of bounds
+  // prevent rendering if head cell is out of bounds
   // clamp head cell so the entire ship fits within the grid bounds
   if (orientation === "h") {
     x = Math.max(1, Math.min(x, 11 - shipLen));
@@ -81,6 +81,8 @@ export function renderShipPreview(x, y, orientation, shipLen, boardSelector) {
       cell.setAttribute("draggable", "true");
     }
   }
+  // return the clamped head cell values for use in drag-and-drop functions
+  return { x, y };
 }
 
 // render placed ships
