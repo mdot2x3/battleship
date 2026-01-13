@@ -319,6 +319,16 @@ export function setupGame(
           currentHeadCell = null;
           updatePlacementText();
           clearShipPreviews(boardSelector);
+
+          // remove listeners from previous board
+          player1Div.removeEventListener("dragstart", handleDragStart);
+          player1Div.removeEventListener("dragover", handleDragOver);
+          player1Div.removeEventListener("drop", handleDrop);
+          // add listeners to new board
+          player2Div.addEventListener("dragstart", handleDragStart);
+          player2Div.addEventListener("dragover", handleDragOver);
+          player2Div.addEventListener("drop", handleDrop);
+
           return;
         }
         if (mode === "pvc") {
