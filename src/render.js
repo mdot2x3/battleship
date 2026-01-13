@@ -128,10 +128,19 @@ export function updateGameText(html) {
 export function setBoardHighlight(player1Div, player2Div, currentTurn) {
   player1Div.classList.remove("active-board");
   player2Div.classList.remove("active-board");
+
+  // remove label highlights from both labels
+  const playerLabels = document.querySelectorAll(".player-label");
+  playerLabels.forEach((label) => label.classList.remove("active-label"));
+
   if (currentTurn === "Player 1") {
+    // highlight Player 1's label
+    if (playerLabels[0]) playerLabels[0].classList.add("active-label");
     // player 1 attacks player 2's board
     player2Div.classList.add("active-board");
   } else {
+    // highlight Player 2's label
+    if (playerLabels[1]) playerLabels[1].classList.add("active-label");
     // player 2 attacks player 1's board
     player1Div.classList.add("active-board");
   }
