@@ -28,9 +28,11 @@ export function newGame() {
   createGrid(10, 10, player1Div);
   createGrid(10, 10, player2Div);
   updateGameText(`
+    <div class="button-row">
     <p>Choose a game mode:</p>
     <button class="mode-button" data-mode="pvp">Player vs Player</button>
     <button class="mode-button" data-mode="pvc">Player vs Computer</button>
+    </div>
   `);
   document.querySelectorAll(".mode-button").forEach((btn) => {
     btn.onclick = (e) => {
@@ -45,10 +47,12 @@ export function newGame() {
       } else if (mode === "pvc") {
         // show difficulty selection
         updateGameText(`
+          <div class="button-row">
           <p>Select Computer Difficulty:</p>
           <button class="difficulty-button" data-difficulty="easy">Easy</button>
           <button class="difficulty-button" data-difficulty="medium">Medium</button>
           <button class="difficulty-button" data-difficulty="hard">Hard</button>
+          </div>
         `);
         document.querySelectorAll(".difficulty-button").forEach((dbtn) => {
           dbtn.onclick = (ev) => {
@@ -91,7 +95,8 @@ export function setupGame(
   function updatePlacementText() {
     updateGameText(`
       <p>${currentPlayerString}, place your ${shipList[currentShipIndex]} on the board.</p>
-      <p>Click again to rotate. Click elsewhere to move. Confirm placement when ready.</p>
+      <p>Click to place the ship. Click elsewhere to move it or drag-and-drop. Click on the ship to rotate it. Confirm placement when ready.</p>
+      <p>Your ships will be hidden once all ships have been placed on your board.</p>
       <button class="confirm-button">Confirm</button>
       <button class="reset-button">Reset</button>
     `);
@@ -427,7 +432,7 @@ export function startGame(player1, player2, mode, difficulty = "medium") {
   let gameOver = false;
 
   updateGameText(`
-      <p>Click on the opponents board to try and hit their ship.</p>
+      <p>Click on the opponent's board to try and hit their ships.</p>
       <p>A red square means you've landed a hit. A blue square means you've missed.</p>
       <p>Click to begin the battle!</p>
       <button class="start-button">Start</button>
@@ -460,7 +465,7 @@ export function startGame(player1, player2, mode, difficulty = "medium") {
         if (!attack) return;
         const { x, y } = attack;
         processAttack(x, y, player1, player1Div, "Player 1");
-      }, 700);
+      }, 1900);
     } else {
       domContent.addEventListener("click", handlePlayerAttack);
     }

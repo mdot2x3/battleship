@@ -24,14 +24,26 @@ header {
 
 .game-text {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 10px;
   margin-top: 20px;
   margin-bottom: 20px;
   font-family: "Bitcount Prop Single", sans-serif;
   font-size: 1.5rem;
+  text-align: center;
   color: white;
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .dom-content {
@@ -161,17 +173,73 @@ header {
   border-radius: 8px;
   text-align: center;
 }
-
-.play-again-button {
-  padding: 0.5em 0.5em;
-  font-size: 1em;
-  background: #4caf50;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s;
+.modal p {
+  margin-bottom: 1.5em;
 }
-.play-again-button:hover {
-  background: #388e3c;
+
+/* general button style for all game buttons */
+button,
+.play-again-button,
+.start-button,
+.reset-button,
+.confirm-button,
+.mode-button,
+.difficulty-button {
+  padding: 0.3em 0.3em;
+  font-size: 1rem;
+  font-family: "Bitcount Prop Single", "Special Elite", monospace, sans-serif;
+  border: 2px solid #1a2636;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #3b4c5e 0%, #1a2636 100%);
+  color: #eaf4ff;
+  box-shadow:
+    0 2px 8px rgba(26, 38, 54, 0.18),
+    0 1.5px 0 #22334a inset;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s,
+    transform 0.1s;
+  margin: 0 0.2em;
+  outline: none;
+}
+
+button:hover,
+.play-again-button:hover,
+.start-button:hover,
+.reset-button:hover,
+.confirm-button:hover,
+.mode-button:hover,
+.difficulty-button:hover {
+  background: linear-gradient(180deg, #22334a 0%, #3b4c5e 100%);
+  box-shadow:
+    0 4px 16px rgba(26, 38, 54, 0.28),
+    0 2px 0 #22334a inset;
+  transform: translateY(-2px) scale(1.04);
+}
+
+button:active,
+.play-again-button:active,
+.start-button:active,
+.reset-button:active,
+.confirm-button:active,
+.mode-button:active,
+.difficulty-button:active {
+  background: linear-gradient(180deg, #16202c 0%, #22334a 100%);
+  box-shadow:
+    0 1px 4px rgba(26, 38, 54, 0.22),
+    0 1px 0 #22334a inset;
+  transform: translateY(1px) scale(0.98);
+}
+
+button:focus,
+.play-again-button:focus,
+.start-button:focus,
+.reset-button:focus,
+.confirm-button:focus,
+.mode-button:focus,
+.difficulty-button:focus {
+  outline: 2px solid #6be0ff;
+  outline-offset: 2px;
 }
