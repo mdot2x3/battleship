@@ -435,12 +435,12 @@ export function startGame(player1, player2, mode, difficulty = "medium") {
   // must wrap the call in an anonymous function so no event object is passed which was causing '[object PointerEvent]' to appear for ${sunkMessage} below, instead it will be the default empty string
   document.querySelector(".start-button").onclick = () => nextTurn();
 
-  function nextTurn(sunkMessage = "") {
+  function nextTurn(attackMessage = "") {
     if (gameOver) return;
 
     // update UI for current turn
     updateGameText(`
-      ${sunkMessage}
+      ${attackMessage}
       <p>${currentTurn}, it is your turn.</p>
     `);
     setBoardHighlight(player1Div, player2Div, currentTurn);
@@ -496,6 +496,12 @@ export function startGame(player1, player2, mode, difficulty = "medium") {
     }
   }
 
+  // helper function to translate coordinate data to match axis labels
+  function formatAttackLocation(x, y) {
+    const letters = "ABCDEFGHIJ";
+    return `${letters[y - 1]}${x}`;
+  }
+
   function processAttack(x, y, defender, defenderDiv, nextPlayer) {
     // call the defender's gameboard to process the attack and get the result
     let attackResult = defender.gameboard.receiveAttack(x, y);
@@ -510,10 +516,17 @@ export function startGame(player1, player2, mode, difficulty = "medium") {
         attackResult.result === "miss" ? "blue" : "red";
     }
 
-    // prepare a message if a ship was sunk during this attack
-    let sunkMessage = "";
-    if (attackResult.result === "sunk") {
-      sunkMessage = `<p>${currentTurn} has sunk the enemy's ${attackResult.shipName}!</p>`;
+    // build attack message
+    let attackMessage = `<p>Turn result: ${currentTurn} attacked ${formatAttackLocation(x, y)}; it was a `;
+    if (attackResult.result === "miss") {
+      attackMessage += `Miss.</p>`;
+    } else if (attackResult.result === "hit") {
+      attackMessage += `Hit.</p>`;
+    } else if (attackResult.result === "sunk") {
+      attackMessage += `Hit and they Sunk the enemy's ${attackResult.shipName}!</p>`;
+    } else {
+      // no message for already-attacked or other results
+      attackMessage = "";
     }
 
     // update computer attack state if it's the computer's turn
@@ -525,7 +538,7 @@ export function startGame(player1, player2, mode, difficulty = "medium") {
     if (defender.gameboard.reportAllSunk()) {
       gameOver = true;
       updateGameText(`
-        ${sunkMessage}
+        ${attackMessage}
         <p>Game Over! ${currentTurn} wins!</p>
         <button class="play-again-button">Play Again</button>
       `);
@@ -536,6 +549,6 @@ export function startGame(player1, player2, mode, difficulty = "medium") {
 
     // switch to the next player's turn and update the UI, passing any sunk message
     currentTurn = nextPlayer;
-    nextTurn(sunkMessage);
+    nextTurn(attackMessage);
   }
 }
