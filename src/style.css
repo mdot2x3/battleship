@@ -147,6 +147,25 @@ header {
   background-color: lightgrey;
 }
 
+.ship-sunk {
+  position: relative;
+}
+
+.ship-sunk::after {
+  content: "✖";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 1.8em;
+  font-weight: bold;
+  pointer-events: none;
+  text-shadow:
+    0 0 6px #222,
+    0 0 2px #ff483b;
+}
+
 .active-board {
   box-shadow:
     0 0 20px 6px #ff483b,

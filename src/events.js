@@ -529,6 +529,32 @@ export function startGame(player1, player2, mode, difficulty = "medium") {
       attackMessage += `Hit.</p>`;
     } else if (attackResult.result === "sunk") {
       attackMessage += `Hit and they Sunk the enemy's ${attackResult.shipName}!</p>`;
+      // apply css class to visually mark sunk ships
+      // find the coordinates for the sunk ship
+      const shipIndex = [
+        "Carrier",
+        "Battleship",
+        "Cruiser",
+        "Submarine",
+        "Destroyer",
+      ].indexOf(attackResult.shipName);
+      const shipCoords =
+        defender.gameboard[
+          [
+            "shipOneCoordinates",
+            "shipTwoCoordinates",
+            "shipThreeCoordinates",
+            "shipFourCoordinates",
+            "shipFiveCoordinates",
+          ][shipIndex]
+        ];
+      // add .ship-sunk to each cell
+      shipCoords.forEach(([sx, sy]) => {
+        const sunkCell = defenderDiv.querySelector(
+          `.grid-cell[data-x="${sx}"][data-y="${sy}"]`,
+        );
+        if (sunkCell) sunkCell.classList.add("ship-sunk");
+      });
     } else {
       // no message for already-attacked or other results
       attackMessage = "";
